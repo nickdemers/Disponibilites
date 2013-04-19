@@ -1,0 +1,2 @@
+module RemplacementsHelper
+end

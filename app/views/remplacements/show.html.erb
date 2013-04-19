@@ -1,0 +1,25 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Id utilisateur:</b>
+  <%= @remplacement.id_utilisateur %>
+</p>
+
+<p>
+  <b>Id event calendar:</b>
+  <%= @remplacement.id_event_calendar %>
+</p>
+
+<p>
+  <b>Id utilisateur remplacant:</b>
+  <%= @remplacement.id_utilisateur_remplacant %>
+</p>
+
+<p>
+  <b>Statut:</b>
+  <%= @remplacement.statut %>
+</p>
+
+
+<%= link_to 'Edit', edit_remplacement_path(@remplacement) %> |
+<%= link_to 'Back', remplacements_index_path %>
