@@ -1,5 +1,5 @@
 class Remplacement < ActiveRecord::Base
-  attr_accessible :id_event_calendar, :id_utilisateur, :id_utilisateur_remplacant, :statut
+  #strong_parameters :id_event_calendar, :id_utilisateur, :id_utilisateur_remplacant, :statut
 
   belongs_to :utilisateur
 

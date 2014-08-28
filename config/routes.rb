@@ -3,22 +3,24 @@ Disponibilites::Application.routes.draw do
   resources :utilisateurs
 
 
-  # The priority is based upon order of creation:
-  # first created -> highest priority.
+  # The priority is based upon order of creation: first created -> highest priority.
+  # See how all your routes lay out with "rake routes".
 
   get "home/index"
 
-  root to: 'home#index'
+  #root to: 'home#index'
+  root 'home#index'
 
-  match "/auth/:provider/callback" => "sessions#create"
+  get "/auth/:provider/callback" => "sessions#create"
 
-  # Sample of regular route:
-  #   match 'products/:id' => 'catalog#view'
-  # Keep in mind you can assign values other than :controller and :action
+  # You can have the root of your site routed with "root"
+  # root 'welcome#index'
 
-  # Sample of named route:
-  #   match 'products/:id/purchase' => 'catalog#purchase', :as => :purchase
-  # This route can be invoked with purchase_url(:id => product.id)
+  # Example of regular route:
+  #   get 'products/:id' => 'catalog#view'
+
+  # Example of named route that can be invoked with purchase_url(id: product.id)
+  #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
 
   # Sample resource route (maps HTTP verbs to controller actions automatically):
   #   resources :products
@@ -45,7 +47,7 @@ Disponibilites::Application.routes.draw do
   #   resources :products do
   #     resources :comments
   #     resources :sales do
-  #       get 'recent', :on => :collection
+  #       get 'recent', on: :collection
   #     end
   #   end
 
@@ -56,13 +58,4 @@ Disponibilites::Application.routes.draw do
   #     resources :products
   #   end
 
-  # You can have the root of your site routed with "root"
-  # just remember to delete public/index.html.
-  # root :to => 'welcome#index'
-
-  # See how all your routes lay out with "rake routes"
-
-  # This is a legacy wild controller route that's not recommended for RESTful applications.
-  # Note: This route will make all actions in every controller accessible via GET requests.
-  # match ':controller(/:action(/:id))(.:format)'
 end

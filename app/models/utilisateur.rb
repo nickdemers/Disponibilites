@@ -1,7 +1,7 @@
 class Utilisateur < ActiveRecord::Base
-  attr_accessible :courriel, :message_texte_permis, :niveau, :nom, :numero_cellulaire, :numero_telephone, :prenom, :titre
+  #strong_parameters :courriel, :message_texte_permis, :niveau, :nom, :numero_cellulaire, :numero_telephone, :prenom, :titre
 
-  has_many :remplacements
+  has_many :remplacements, :dependent => :restrict
 
   validates :courriel, :nom, :prenom, :numero_telephone, :titre, :presence => true
   validates :nom, :prenom, :length => { :maximum => 255 }
