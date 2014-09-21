@@ -1,6 +1,7 @@
 class HomeController < ApplicationController
   def index
 
+=begin
     if session[:token].nil?
 
       redirect_to "/auth/google_oauth2"
@@ -12,16 +13,16 @@ class HomeController < ApplicationController
       service = client.discovered_api('calendar', 'v3')
 
       result = client.execute(:api_method => service.events.list,
-                               :parameters => {'calendarId' => 'nickdemers@gmail.com'})
+                               :parameters => {'calendarId' => 'nickdemers@gmail.com',
+                                               'timeMin' => DateTime.now,
+                                               'timeMax' => DateTime.now + 600.days})
 
       if !result.nil?
 
         @events_calendar = result.data.items
 
-        @events_calendar.each do |e|
-          puts e.summary
-        end
       end
     end
+=end
   end
 end

@@ -1,0 +1,49 @@
+<h1>Listing disponibilites</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Utilisateur absent</th>
+      <th>Utilisateur remplacant</th>
+      <th>Endroit</th>
+      <th>Niveau</th>
+      <th>Date heure debut</th>
+      <th>Date heure fin</th>
+      <th>Surveillance</th>
+      <th>Specialite</th>
+      <th>Notes</th>
+      <th>Statut</th>
+      <th>Created at</th>
+      <th>Updated at</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @disponibilites.each do |disponibilite| %>
+      <tr>
+        <td><%= disponibilite.utilisateur_absent_id %></td>
+        <td><%= disponibilite.utilisateur_remplacant_id %></td>
+        <td><%= disponibilite.endroit_id %></td>
+        <td><%= disponibilite.niveau_id %></td>
+        <td><%= disponibilite.date_heure_debut %></td>
+        <td><%= disponibilite.date_heure_fin %></td>
+        <td><%= disponibilite.surveillance %></td>
+        <td><%= disponibilite.specialite %></td>
+        <td><%= disponibilite.notes %></td>
+        <td><%= disponibilite.statut %></td>
+        <td><%= disponibilite.created_at %></td>
+        <td><%= disponibilite.updated_at %></td>
+        <td><%= link_to 'Show', disponibilite %></td>
+        <td><%= link_to 'Edit', edit_disponibilite_path(disponibilite) %></td>
+        <td><%= link_to 'Destroy', disponibilite, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Disponibilite', new_disponibilite_path %>

@@ -1,0 +1,65 @@
+<%= form_for(@disponibilite) do |f| %>
+  <% if @disponibilite.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@disponibilite.errors.count, "error") %> prohibited this disponibilite from being saved:</h2>
+
+      <ul>
+      <% @disponibilite.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :utilisateur_absent_id %><br>
+    <%= f.number_field :utilisateur_absent_id %>
+  </div>
+  <div class="field">
+    <%= f.label :utilisateur_remplacant_id %><br>
+    <%= f.number_field :utilisateur_remplacant_id %>
+  </div>
+  <div class="field">
+    <%= f.label :endroit_id %><br>
+    <%= f.number_field :endroit_id %>
+  </div>
+  <div class="field">
+    <%= f.label :niveau_id %><br>
+    <%= f.number_field :niveau_id %>
+  </div>
+  <div class="field">
+    <%= f.label :date_heure_debut %><br>
+    <%= f.datetime_select :date_heure_debut %>
+  </div>
+  <div class="field">
+    <%= f.label :date_heure_fin %><br>
+    <%= f.datetime_select :date_heure_fin %>
+  </div>
+  <div class="field">
+    <%= f.label :surveillance %><br>
+    <%= f.check_box :surveillance %>
+  </div>
+  <div class="field">
+    <%= f.label :specialite %><br>
+    <%= f.check_box :specialite %>
+  </div>
+  <div class="field">
+    <%= f.label :notes %><br>
+    <%= f.text_area :notes %>
+  </div>
+  <div class="field">
+    <%= f.label :statut %><br>
+    <%= f.text_field :statut %>
+  </div>
+  <div class="field">
+    <%= f.label :created_at %><br>
+    <%= f.datetime_select :created_at %>
+  </div>
+  <div class="field">
+    <%= f.label :updated_at %><br>
+    <%= f.datetime_select :updated_at %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

@@ -10,7 +10,6 @@
       </ul>
     </div>
   <% end %>
-
   <div class="field">
     <%= f.label :nom %><br />
     <%= f.text_field :nom %>
@@ -25,7 +24,7 @@
   </div>
   <div class="field">
     <%= f.label :titre %><br />
-    <%= f.text_field :titre %>
+    <%= f.select(:titre,[['Professeur permanent','permanent'],['Professeur remplaçant','remplacant']],{include_blank: ''}) %>
   </div>
   <div class="field">
     <%= f.label :numero_telephone %><br />
@@ -41,7 +40,8 @@
   </div>
   <div class="field">
     <%= f.label :niveau %><br />
-    <%= f.number_field :niveau %>
+    <%= f.select(:niveau,[['1ère','1'],['2e','2'],['3e','3'],['4e','4'],['5e','5'],['6e','6']],{include_blank: ''}) %>
+
   </div>
   <div class="actions">
     <%= f.submit %>

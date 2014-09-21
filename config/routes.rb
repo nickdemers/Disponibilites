@@ -1,4 +1,10 @@
 Disponibilites::Application.routes.draw do
+  resources :niveaus
+
+  resources :endroits
+
+  resources :disponibilites
+
   resources :remplacements
   resources :utilisateurs
 

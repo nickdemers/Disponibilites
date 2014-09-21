@@ -13,18 +13,15 @@
 
   <div class="field">
     <%= f.label :id_utilisateur %><br />
-    <%= f.number_field :id_utilisateur %>
-  </div>
-  <div class="field">
-    <%= f.label :id_event_calendar %><br />
-    <%= f.text_field :id_event_calendar %>
+    <%= f.select(:id_utilisateur, Utilisateur.find_all_by_titre('permanent').collect {|p| [ p.prenom + ' ' + p.nom, p.id ] },{include_blank: ''}) %>
   </div>
   <div class="field">
     <%= f.label :id_utilisateur_remplacant %><br />
-    <%= f.number_field :id_utilisateur_remplacant %>
+    <%= f.select(:id_utilisateur_remplacant, Utilisateur.find_all_by_titre('remplacant').collect {|p| [ p.prenom + ' ' + p.nom, p.id ] },{include_blank: ''}) %>
   </div>
   <div class="field">
     <%= f.label :statut %><br />
+    <%= f.select(:statut,[['Professeur permanent','permanent'],['Professeur remplaçant','remplacant']],{include_blank: ''}) %>
     <%= f.text_field :statut %>
   </div>
   <div class="actions">

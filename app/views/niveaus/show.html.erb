@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Nom:</strong>
+  <%= @niveau.nom %>
+</p>
+
+<p>
+  <strong>Created at:</strong>
+  <%= @niveau.created_at %>
+</p>
+
+<p>
+  <strong>Updated at:</strong>
+  <%= @niveau.updated_at %>
+</p>
+
+<%= link_to 'Edit', edit_niveau_path(@niveau) %> |
+<%= link_to 'Back', niveaus_path %>

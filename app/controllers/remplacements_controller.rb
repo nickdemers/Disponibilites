@@ -40,41 +40,39 @@ class RemplacementsController < ApplicationController
   # POST /remplacements
   # POST /remplacements.json
   def create
-
-    #@auth = request.env["omniauth.auth"]
-    #Use the token from the data to request a list of calendars
-    #@token = @auth["credentials"]["token"]
+=begin
     client = Google::APIClient.new
     client.authorization.access_token = session[:token]
     service = client.discovered_api('calendar', 'v3')
-    #@result = client.execute(
-    #    :api_method => service.calendar_list.list,
-    #    :parameters => {},
-    #    :headers => {'Content-Type' => 'application/json'})
 
+    @remplacement = Remplacement.new(remplacement_params)
+
+    professeur = Utilisateur.find @remplacement.id_utilisateur
 
     event = {
-        'summary' => 'Remplacement test 1',
+        'summary' => professeur.prenom + " " + professeur.nom,
         'location' => 'Somewhere',
         'start' => {
-            'dateTime' => '2013-03-25T11:00:00.000-07:00'
+            'dateTime' => '2015-03-25T11:00:00.000-07:00'
         },
         'end' => {
-            'dateTime' => '2013-03-25T11:25:00.000-07:00'
+            'dateTime' => '2015-03-25T11:25:00.000-07:00'
         },
         'attendees' => [
             {
                 'email' => 'nickdemers@gmail.com'
             }
         ]
-    };
+    }
 
     result = client.execute(:api_method => service.events.insert,
                             :parameters => {'calendarId' => 'nickdemers@gmail.com'},
                             :body => JSON.dump(event),
-                            :headers => {'Content-Type' => 'application/json'});
+                            :headers => {'Content-Type' => 'application/json'})
 
-  @remplacement = Remplacement.new(params[:remplacement]);
+    @remplacement.id_event_calendar= result.data.id
+=end
+    @remplacement = Remplacement.new(remplacement_params)
 
     respond_to do |format|
       if @remplacement.save
@@ -93,7 +91,7 @@ class RemplacementsController < ApplicationController
     @remplacement = Remplacement.find(params[:id])
 
     respond_to do |format|
-      if @remplacement.update_attributes(params[:remplacement])
+      if @remplacement.update_attributes(remplacement_params)
         format.html { redirect_to @remplacement, notice: 'remplacements was successfully updated.' }
         format.json { head :no_content }
       else
@@ -110,8 +108,13 @@ class RemplacementsController < ApplicationController
     @remplacement.destroy
 
     respond_to do |format|
-      format.html { redirect_to remplacements_index_url }
+      format.html { redirect_to remplacements_path }
       format.json { head :no_content }
     end
+  end
+
+  private
+  def remplacement_params
+    params.require(:remplacement).permit(:id_event_calendar, :id_utilisateur, :id_utilisateur_remplacant, :statut)
   end
 end

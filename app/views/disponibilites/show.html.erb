@@ -1,0 +1,64 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Utilisateur absent:</strong>
+  <%= @disponibilite.utilisateur_absent_id %>
+</p>
+
+<p>
+  <strong>Utilisateur remplacant:</strong>
+  <%= @disponibilite.utilisateur_remplacant_id %>
+</p>
+
+<p>
+  <strong>Endroit:</strong>
+  <%= @disponibilite.endroit_id %>
+</p>
+
+<p>
+  <strong>Niveau:</strong>
+  <%= @disponibilite.niveau_id %>
+</p>
+
+<p>
+  <strong>Date heure debut:</strong>
+  <%= @disponibilite.date_heure_debut %>
+</p>
+
+<p>
+  <strong>Date heure fin:</strong>
+  <%= @disponibilite.date_heure_fin %>
+</p>
+
+<p>
+  <strong>Surveillance:</strong>
+  <%= @disponibilite.surveillance %>
+</p>
+
+<p>
+  <strong>Specialite:</strong>
+  <%= @disponibilite.specialite %>
+</p>
+
+<p>
+  <strong>Notes:</strong>
+  <%= @disponibilite.notes %>
+</p>
+
+<p>
+  <strong>Statut:</strong>
+  <%= @disponibilite.statut %>
+</p>
+
+<p>
+  <strong>Created at:</strong>
+  <%= @disponibilite.created_at %>
+</p>
+
+<p>
+  <strong>Updated at:</strong>
+  <%= @disponibilite.updated_at %>
+</p>
+
+<%= link_to 'Edit', edit_disponibilite_path(@disponibilite) %> |
+<%= link_to 'Back', disponibilites_path %>
