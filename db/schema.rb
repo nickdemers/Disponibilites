@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140921171500) do
+ActiveRecord::Schema.define(version: 20140921174800) do
 
   create_table "disponibilites", force: true do |t|
     t.integer  "utilisateur_absent_id"
@@ -40,6 +40,7 @@ ActiveRecord::Schema.define(version: 20140921171500) do
     t.string   "nom"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "code"
   end
 
   create_table "remplacements", force: true do |t|

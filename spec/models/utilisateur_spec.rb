@@ -5,8 +5,7 @@ describe Utilisateur do
 
   describe "Création" do
     it "avec succès" do
-      Utilisateur.create({prenom: 'Nicolas', nom: 'Demers', courriel: 'nickdemers@gmail.com', numero_telephone: '418 777-5555',
-                          titre: 'Permanent'}).should be_valid
+      expect(FactoryGirl.create(:utilisateur_permanent)).to be_valid
     end
 
     it "en erreur, doit contenir un courriel" do

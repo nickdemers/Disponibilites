@@ -47,9 +47,9 @@
           <a class="brand" href="/">Disponibilites</a>
           <div class="container-fluid nav-collapse">
             <ul class="nav">
-              <li><%= link_to "Ajouter une disponibilitée", "/remplacements#create"  %></li>
+              <li><%= link_to "Ajouter une disponibilitée", "/disponibilites#create"  %></li>
               <li><%= link_to "Ajouter un utilisateur", "/utilisateurs#create"  %></li>
-              <!--<li>--><%= #link_to "Sign in with Google", "/auth/google_oauth2" %><!--</li>-->
+              <!--<li> link_to "Sign in with Google", "/auth/google_oauth2" </li>-->
             </ul>
           </div><!--/.nav-collapse -->
         </div>
@@ -62,12 +62,16 @@
           <div class="well sidebar-nav">
             <ul class="nav nav-list">
               <li class="nav-header">Sidebar</li>
+              <% if !@disponibilites_avenir.nil? then
+                   @disponibilites_avenir.each do |d| %>
+                     <li><%= d.utilisateur_absent.nom %>, <%= d.utilisateur_absent.prenom %></li>
+              <%   end
+                 end %>
               <% #if !@events_calendar.nil? then
                   # @events_calendar.each do |e| %>
                    <!--  <li>< e.summary ></li> -->
               <% #  end
                  #end %>
-
             </ul>
           </div><!--/.well -->
         </div><!--/span-->

@@ -38,3 +38,4 @@ gem 'factory_girl_rails', group: [:test]
 gem 'capybara', group: [:test]
 gem 'rspec', group: [:test]
 gem 'rspec-rails', group: [:test]
+gem 'simplecov', :require => false, :group => :test

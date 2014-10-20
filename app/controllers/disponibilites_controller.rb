@@ -14,17 +14,35 @@ class DisponibilitesController < ApplicationController
 
   # GET /disponibilites/new
   def new
+    @utilisateur_absent = Utilisateur.where("titre = 'permanent'").all
     @disponibilite = Disponibilite.new
+    if @utilisateur_absent.nil?
+      respond_to do |format|
+        format.html { redirect_to disponibilites_url, alert: "Aucun utilisateur absent disponible." }
+        format.json { head :no_content }
+      end
+    end
   end
 
   # GET /disponibilites/1/edit
   def edit
+    @utilisateur_absent = Utilisateur.where("titre = 'permanent'").all
   end
 
   # POST /disponibilites
   # POST /disponibilites.json
   def create
+    @utilisateur_absent = Utilisateur.where("titre = 'permanent'").all
+
     @disponibilite = Disponibilite.new(disponibilite_params)
+
+    @utilisateur_remplacant = Utilisateur.order("id").joins(:disponibilites_remplacant).where(["titre = 'remplacant' and ((? < disponibilites.date_heure_debut) or (? > disponibilites.date_heure_fin))", @disponibilite.date_heure_fin, @disponibilite.date_heure_debut]).first
+
+    @disponibilite.utilisateur_remplacant= @utilisateur_remplacant
+
+    if !@utilisateur_remplacant.nil?
+      @disponibilite.statut= "attente"
+    end
 
     respond_to do |format|
       if @disponibilite.save
@@ -45,6 +63,7 @@ class DisponibilitesController < ApplicationController
         format.html { redirect_to @disponibilite, notice: 'Disponibilite was successfully updated.' }
         format.json { head :no_content }
       else
+        @utilisateur_absent = Utilisateur.where("titre = 'permanent'").all
         format.html { render action: 'edit' }
         format.json { render json: @disponibilite.errors, status: :unprocessable_entity }
       end

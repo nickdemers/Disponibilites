@@ -4,6 +4,7 @@
   <thead>
     <tr>
       <th>Nom</th>
+      <th>Code</th>
       <th>Created at</th>
       <th>Updated at</th>
       <th></th>
@@ -16,6 +17,7 @@
     <% @niveaus.each do |niveau| %>
       <tr>
         <td><%= niveau.nom %></td>
+        <td><%= niveau.code %></td>
         <td><%= niveau.created_at %></td>
         <td><%= niveau.updated_at %></td>
         <td><%= link_to 'Show', niveau %></td>

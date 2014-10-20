@@ -1,9 +1,8 @@
 class Utilisateur < ActiveRecord::Base
   #strong_parameters :courriel, :message_texte_permis, :niveau, :nom, :numero_cellulaire, :numero_telephone, :prenom, :titre
 
-  #has_many :remplacements, :dependent => :restrict
-  #has_many :remplacements
-  has_many :disponibilites
+  has_many :disponibilites_absent, :foreign_key => 'utilisateur_absent_id', :class_name => 'Disponibilite'
+  has_many :disponibilites_remplacant, :foreign_key => 'utilisateur_remplacant_id', :class_name => 'Disponibilite'
 
   validates_presence_of :courriel, :nom, :prenom, :numero_telephone, :titre
   validates_length_of :nom, :prenom, :maximum => 255

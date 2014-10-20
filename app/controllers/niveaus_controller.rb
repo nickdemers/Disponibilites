@@ -69,6 +69,6 @@ class NiveausController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def niveau_params
-      params.require(:niveau).permit(:nom, :created_at, :updated_at)
+      params.require(:niveau).permit(:nom, :created_at, :updated_at, :code)
     end
 end
