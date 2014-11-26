@@ -13,7 +13,7 @@
 
 ActiveRecord::Schema.define(version: 20140921174800) do
 
-  create_table "disponibilites", force: true do |t|
+  create_table "disponibilites_bck", force: true do |t|
     t.integer  "utilisateur_absent_id"
     t.integer  "utilisateur_remplacant_id"
     t.integer  "endroit_id"
@@ -52,7 +52,7 @@ ActiveRecord::Schema.define(version: 20140921174800) do
     t.datetime "updated_at",                null: false
   end
 
-  create_table "utilisateurs", force: true do |t|
+  create_table "utilisateurs_bck", force: true do |t|
     t.string   "nom"
     t.string   "prenom"
     t.string   "courriel"

@@ -13,4 +13,5 @@ class Disponibilite < ActiveRecord::Base
   validate :date_debut_avant_date_fin
   validate :dates_non_passees
   validate :disponible
+
 end

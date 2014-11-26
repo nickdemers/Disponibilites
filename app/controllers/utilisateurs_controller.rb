@@ -1,4 +1,7 @@
 class UtilisateursController < ApplicationController
+  before_action :set_utilisateur, only: [:show, :edit, :update, :destroy]
+  before_action :set_disponibilites_avenir, only: [:index, :show, :new, :edit]
+
   # GET /utilisateurs
   # GET /utilisateurs.json
   def index
@@ -13,8 +16,6 @@ class UtilisateursController < ApplicationController
   # GET /utilisateurs/1
   # GET /utilisateurs/1.json
   def show
-    @utilisateur = Utilisateur.find(params[:id])
-
     respond_to do |format|
       format.html # show.html.erb
       format.json { render json: @utilisateur }
@@ -34,7 +35,6 @@ class UtilisateursController < ApplicationController
 
   # GET /utilisateurs/1/edit
   def edit
-    @utilisateur = Utilisateur.find(params[:id])
   end
 
   # POST /utilisateurs
@@ -47,6 +47,8 @@ class UtilisateursController < ApplicationController
         format.html { redirect_to @utilisateur, notice: 'utilisateurs was successfully created.' }
         format.json { render json: @utilisateur, status: :created, location: @utilisateur }
       else
+        set_disponibilites_avenir
+
         format.html { render action: "new" }
         format.json { render json: @utilisateur.errors, status: :unprocessable_entity }
       end
@@ -56,13 +58,13 @@ class UtilisateursController < ApplicationController
   # PUT /utilisateurs/1
   # PUT /utilisateurs/1.json
   def update
-    @utilisateur = Utilisateur.find(params[:id])
-
     respond_to do |format|
-      if @utilisateur.update_attributes(utilisateur_params)
+      if @utilisateur.update(utilisateur_params)
         format.html { redirect_to @utilisateur, notice: 'utilisateurs was successfully updated.' }
         format.json { head :no_content }
       else
+        set_disponibilites_avenir
+
         format.html { render action: "edit" }
         format.json { render json: @utilisateur.errors, status: :unprocessable_entity }
       end
@@ -72,7 +74,6 @@ class UtilisateursController < ApplicationController
   # DELETE /utilisateurs/1
   # DELETE /utilisateurs/1.json
   def destroy
-    @utilisateur = Utilisateur.find(params[:id])
     @utilisateur.destroy
 
     respond_to do |format|
@@ -82,6 +83,14 @@ class UtilisateursController < ApplicationController
   end
 
   private
+    def set_utilisateur
+      @utilisateur = Utilisateur.find(params[:id])
+    end
+
+    def set_disponibilites_avenir
+      @disponibilites_avenir = get_disponibilites_avenir_non_attribue
+    end
+
     def utilisateur_params
       params.require(:utilisateur).permit(:courriel, :message_texte_permis, :niveau, :nom, :numero_cellulaire, :numero_telephone, :prenom, :titre)
     end

@@ -1,0 +1,212 @@
+<div class='row'>
+  <!--<div class='col-sm-12'>  -->
+  <div class='col-xs-12'>
+    <div class='page-header'>
+      <h1 class='pull-left'>
+        <i class='icon-calendar'></i>
+        <span>Calendar</span>
+      </h1>
+      <!--<div class='pull-right'>
+        <ul class='breadcrumb'>
+          <li>
+            <a href='index.html'>
+              <i class='icon-bar-chart'></i>
+            </a>
+          </li>
+          <li class='separator'>
+            <i class='icon-angle-right'></i>
+          </li>
+          <li class='active'>Calendar</li>
+        </ul>
+      </div> -->
+    </div>
+  </div>
+</div>
+<div class='row'>
+  <!--<div class='col-sm-3' id='events'>
+    <div class='box'>
+      <div class='box-header'>
+        <div class='title'>Draggable events</div>
+      </div>
+      <div class='box-content'>
+        <div class='label label-important external-event' data-event-class='label-important'>Jane meetup</div>
+        <div class='label label-warning external-event' data-event-class='label-warning'>Shopping</div>
+        <div class='label label-success external-event' data-event-class='label-success'>Dentist</div>
+        <hr class='hr-normal'>
+        <label class='checkbox'>
+          <input id='calendar-remove-after-drop' type='checkbox' value='option1'>
+          Remove after drop?
+        </label>
+        <hr class='hr-normal'>
+        <form id="new-event" style="margin-bottom:0;" method="post" action="#" accept-charset="UTF-8"><input name="authenticity_token" type="hidden" /><div class='form-group'>
+          <input class='form-control' id='new-event-input' placeholder='Event name' type='text'>
+        </div>
+          <button class='btn btn-primary btn-block'>
+            <i class='icon-plus'></i>
+            Create event
+          </button>
+        </form>
+
+      </div>
+    </div>
+  </div> -->
+  <div class='col-sm-9'>
+    <div class='box'>
+      <div class='box-header'>
+        <div class='title'>Home and work</div>
+      </div>
+      <div class='box-content'>
+        <div class='full-calendar-demo'></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--<div class='box box-bordered purple-border'>
+    <div class='box-header purple-background'>
+      <div class='title'>
+        <i class='icon-calendar'></i>
+        Calendar
+      </div>
+    </div>
+    <div class='box-content'>  -->
+      <!-- calendar definition -->
+<!--      <div class='full-calendar-demo'></div>
+    </div>
+</div>  -->
+
+<script>
+    (function() {
+        var cal, calendarDate, d, m, y;
+
+        /*this.setDraggableEvents = function() {
+            return $("#events .external-event").each(function() {
+                var eventObject;
+                eventObject = {
+                    title: $.trim($(this).text())
+                };
+                $(this).data("eventObject", eventObject);
+                return $(this).draggable({
+                    zIndex: 999,
+                    revert: true,
+                    revertDuration: 0
+                });
+            });
+        };
+
+        setDraggableEvents(); */
+
+        calendarDate = new Date();
+
+        d = calendarDate.getDate();
+
+        m = calendarDate.getMonth();
+
+        y = calendarDate.getFullYear();
+
+        cal = $(".full-calendar-demo").fullCalendar({
+            header: {
+                center: "title",
+                left: "basicDay,basicWeek,month",
+                right: "prev,today,next"
+            },
+            buttonText: {
+                prev: "<span class=\"icon-chevron-left\"></span>",
+                next: "<span class=\"icon-chevron-right\"></span>",
+                today: "Today",
+                basicDay: "Day",
+                basicWeek: "Week",
+                month: "Month"
+            },
+            droppable: false,
+            editable: false,
+            selectable: false,
+            viewRender: function( view, element ){
+                events: '/disponibilites/for_calendar'
+            },
+            /*select: function(start, end, allDay) {
+                return bootbox.prompt("Event title", function(title) {
+                    if (title !== null) {
+                        cal.fullCalendar("renderEvent", {
+                            title: title,
+                            start: start,
+                            end: end,
+                            allDay: allDay
+                        }, true);
+                        return cal.fullCalendar('unselect');
+                    }
+                });
+            },
+            eventClick: function(calEvent, jsEvent, view) {
+                return bootbox.dialog({
+                    message: $("<form class='form'><label>Change event name</label></form><input id='new-event-title' class='form-control' type='text' value='" + calEvent.title + "' /> "),
+                    buttons: {
+                        "delete": {
+                            label: "<i class='icon-trash'></i> Delete Event",
+                            className: "pull-left",
+                            callback: function() {
+                                return cal.fullCalendar("removeEvents", function(ev) {
+                                    return ev._id === calEvent._id;
+                                });
+                            }
+                        },
+                        success: {
+                            label: "<i class='icon-save'></i> Save",
+                            className: "btn-success",
+                            callback: function() {
+                                calEvent.title = $("#new-event-title").val();
+                                return cal.fullCalendar('updateEvent', calEvent);
+                            }
+                        }
+                    }
+                });
+            },
+            drop: function(date, allDay) {
+                var copiedEventObject, eventClass, originalEventObject;
+                originalEventObject = $(this).data("eventObject");
+                originalEventObject.id = Math.floor(Math.random() * 99999);
+                eventClass = $(this).attr('data-event-class');
+                console.log(originalEventObject);
+                copiedEventObject = $.extend({}, originalEventObject);
+                copiedEventObject.start = date;
+                copiedEventObject.allDay = allDay;
+                if (eventClass) {
+                    copiedEventObject["className"] = [eventClass];
+                }
+                $(".full-calendar-demo").fullCalendar("renderEvent", copiedEventObject, true);
+                if ($("#calendar-remove-after-drop").is(":checked")) {
+                    return $(this).remove();
+                }
+            },*/
+            eventSources : [
+                {url: '/disponibilites/for_calendar'}
+
+            //events: [
+                <% #if !@disponibilites.nil? then
+                   #compteurDisponibilite = 0
+                   #@disponibilites.each do |d| %>
+                //{
+                /*    id: < #d.id %>,
+                    title: "< #d.date_heure_debut.strftime("%H:%M") + " - " + d.date_heure_fin.strftime("%H:%M") %>",
+                    <%  #if d.statut.eql?("attribue") then %>
+                    className: 'event-green',
+                    <%  #elsif d.statut.eql?("attente") then %>
+                    className: 'event-orange',
+                    <%  #elsif d.statut.eql?("disponible") then %>
+                    className: 'event-red',
+                    <%  #end %>
+                    start: new Date("< #d.date_heure_debut.strftime("%Y/%m/%d") %>"),
+                    end: new Date("< #d.date_heure_fin.strftime("%Y/%m/%d") %>")
+                    //url: "<%# disponibilite_path(d) %>"
+                    <% #compteurDisponibilite += 1 %>
+                }
+                <%    #if compteurDisponibilite != @disponibilites.size %>
+                ,  */
+                <%    #end %>
+                <% # end
+                   #end %>
+            ]
+        });
+
+    }).call(this);
+</script>

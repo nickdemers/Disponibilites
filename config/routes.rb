@@ -3,11 +3,14 @@ Disponibilites::Application.routes.draw do
 
   resources :endroits
 
-  resources :disponibilites
+  resources :disponibilites do
+    collection do
+      get "for_calendar"#..., defaults: { format: 'json' }
+    end
+  end
 
   resources :remplacements
   resources :utilisateurs
-
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

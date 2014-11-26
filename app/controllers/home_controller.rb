@@ -1,8 +1,8 @@
 class HomeController < ApplicationController
   def index
 
-    @disponibilites_avenir = Disponibilite.where("utilisateur_remplacant_id is null and date_heure_debut between :date_debut and :date_fin", {date_debut: Date.current, date_fin: Date.current + 2.months})
-
+    @disponibilites_avenir = get_disponibilites_avenir_non_attribue
+    @disponibilites = Disponibilite.all
 =begin
     if session[:token].nil?
 

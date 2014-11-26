@@ -1,51 +1,54 @@
-<h1>Listing disponibilites</h1>
-
-<table>
+<%- model_class = Disponibilite -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+</div>
+<table class="table table-striped">
   <thead>
     <tr>
-      <th>Utilisateur absent</th>
-      <th>Utilisateur remplacant</th>
-      <th>Endroit</th>
-      <th>Niveau</th>
-      <th>Date heure debut</th>
-      <th>Date heure fin</th>
-      <th>Surveillance</th>
-      <th>Specialite</th>
-      <th>Notes</th>
-      <th>Statut</th>
-      <th>Created at</th>
-      <th>Updated at</th>
-      <th></th>
-      <th></th>
-      <th></th>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <th><%= model_class.human_attribute_name(:utilisateur_absent_id) %></th>
+      <th><%= model_class.human_attribute_name(:utilisateur_remplacant_id) %></th>
+      <th><%= model_class.human_attribute_name(:endroit_id) %></th>
+      <th><%= model_class.human_attribute_name(:niveau_id) %></th>
+      <th><%= model_class.human_attribute_name(:date_heure_debut) %></th>
+      <th><%= model_class.human_attribute_name(:date_heure_fin) %></th>
+      <th><%= model_class.human_attribute_name(:surveillance) %></th>
+      <th><%= model_class.human_attribute_name(:specialite) %></th>
+      <th><%= model_class.human_attribute_name(:notes) %></th>
+      <th><%= model_class.human_attribute_name(:statut) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
   </thead>
-
   <tbody>
-    <% if !@disponibilites.nil?
-        @disponibilites.each do |disponibilite| %>
+    <% @disponibilites.each do |disponibilite| %>
       <tr>
-        <td><%= disponibilite.utilisateur_absent_id %></td>
-        <td><%= disponibilite.utilisateur_remplacant_id %></td>
-        <td><%= disponibilite.endroit_id %></td>
-        <td><%= disponibilite.niveau_id %></td>
-        <td><%= disponibilite.date_heure_debut %></td>
-        <td><%= disponibilite.date_heure_fin %></td>
+        <td><%= link_to disponibilite.id, disponibilite_path(disponibilite) %></td>
+        <td><%= disponibilite.utilisateur_absent.nom + ", " + disponibilite.utilisateur_absent.prenom %></td>
+        <td><%= disponibilite.utilisateur_remplacant_id.nil? ? "" : disponibilite.utilisateur_remplacant.nom + ", " + disponibilite.utilisateur_remplacant.prenom  %></td>
+        <td><%= get_description_ecole(disponibilite.endroit_id) %></td>
+        <td><%= get_description_niveau(disponibilite.niveau_id) %></td>
+        <td><%= disponibilite.date_heure_debut.strftime("%Y/%m/%d %H:%M") %></td>
+        <td><%= disponibilite.date_heure_fin.strftime("%Y/%m/%d %H:%M") %></td>
         <td><%= disponibilite.surveillance %></td>
         <td><%= disponibilite.specialite %></td>
         <td><%= disponibilite.notes %></td>
-        <td><%= disponibilite.statut %></td>
-        <td><%= disponibilite.created_at %></td>
-        <td><%= disponibilite.updated_at %></td>
-        <td><%= link_to 'Show', disponibilite %></td>
-        <td><%= link_to 'Edit', edit_disponibilite_path(disponibilite) %></td>
-        <td><%= link_to 'Destroy', disponibilite, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= get_description_statut(disponibilite.statut) %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_disponibilite_path(disponibilite), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      disponibilite_path(disponibilite),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
       </tr>
-    <%  end
-       end %>
+    <% end %>
   </tbody>
 </table>
 
-<br>
+<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_disponibilite_path,
+            :class => 'btn btn-primary' %>
 
-<%= link_to 'New Disponibilite', new_disponibilite_path %>
+

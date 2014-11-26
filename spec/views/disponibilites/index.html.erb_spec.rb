@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe "disponibilites/index" do
+describe "disponibilites_bck/index" do
   before(:each) do
-    assign(:disponibilites, [
+    assign(:disponibilites_bck, [
       stub_model(Disponibilite,
         :utilisateur_absent_id => 1,
         :utilisateur_remplacant_id => 2,
@@ -26,7 +26,7 @@ describe "disponibilites/index" do
     ])
   end
 
-  it "renders a list of disponibilites" do
+  it "renders a list of disponibilites_bck" do
     render
     # Run the generator again with the --webrat flag if you want to use webrat matchers
     assert_select "tr>td", :text => 1.to_s, :count => 2

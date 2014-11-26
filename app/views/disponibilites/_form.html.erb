@@ -1,54 +1,114 @@
-<%= form_for(@disponibilite) do |f| %>
-  <% if @disponibilite.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@disponibilite.errors.count, "error") %> prohibited this disponibilite from being saved:</h2>
+<%= form_for @disponibilite, :html => { :class => "form-horizontal disponibilite" } do |f| %>
 
-      <ul>
-      <% @disponibilite.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
+  <% if @disponibilite.errors.any? %>
+    <div id="error_expl" class="panel panel-danger">
+      <div class="panel-heading">
+        <h3 class="panel-title"><%= pluralize(@disponibilite.errors.count, "error") %> prohibited this disponibilite from being saved:</h3>
+      </div>
+      <div class="panel-body">
+        <ul>
+        <% @disponibilite.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        </ul>
+      </div>
     </div>
   <% end %>
 
-  <div class="field">
-    <%= f.label :utilisateur_absent_id %><br>
-    <%= f.select(:utilisateur_absent_id, @utilisateur_absent.collect {|p| [ p.prenom + ' ' + p.nom, p.id ] },{include_blank: ''}) %>
+  <div class="form-group">
+    <%= f.label :utilisateur_absent_id, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-6">
+      <%= f.select(:utilisateur_absent_id, @utilisateur_absent.collect {|p| [ p.prenom + ' ' + p.nom, p.id ] },{include_blank: ''}, :class => 'form-control') %>
+    </div>
+    <%=f.error_span(:utilisateur_absent_id) %>
   </div>
-  <div class="field">
-    <%= f.label :endroit_id %><br>
-    <%= f.select(:endroit_id,[['École 1','1'],['École 2','2'],['École 3','3'],['École 4','4']],{include_blank: ''}) %>
+  <div class="form-group">
+    <%= f.label :utilisateur_remplacant_id, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-6">
+      <%= f.text_field :utilisateur_remplacant_id, :value => get_utilisateur_remplacant_nom_format, :class => 'form-control', :disabled => 'disabled' %>
+    </div>
+    <%=f.error_span(:utilisateur_remplacant_id) %>
   </div>
-  <div class="field">
-    <%= f.label :niveau_id %><br>
-    <%= f.select(:niveau_id,[['Maternelle','1'],['1ère année','2'],['2e année','3'],['3e année','4'],['4e année','5'],['5e année','6'],['6e année','7']],{include_blank: ''}) %>
+  <div class="form-group">
+    <%= f.label :endroit_id, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-6">
+      <%= f.select(:endroit_id, DisponibilitesHelper::LISTE_ECOLE, {include_blank: ''}, :class => 'form-control') %>
+    </div>
+    <%=f.error_span(:endroit_id) %>
   </div>
-  <div class="field">
-    <%= f.label :date_heure_debut %><br>
-    <%= f.datetime_select :date_heure_debut %>
+  <div class="form-group">
+    <%= f.label :niveau_id, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-6">
+      <%= f.select(:niveau_id, UtilisateursHelper::LISTE_NIVEAU, {include_blank: ''}, :class => 'form-control') %>
+    </div>
+    <%=f.error_span(:niveau_id) %>
   </div>
-  <div class="field">
-    <%= f.label :date_heure_fin %><br>
-    <%= f.datetime_select :date_heure_fin %>
+  <div class="form-group">
+    <%= f.label :date_heure, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-6">
+      <div class="controls">
+        <div class="input-prepend input-group">
+          <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+          <input type="text" style="width: 400px" name="daterangepicker" id="date_heure" class="form-control datepicker" value="<%= get_date_heure_format %>" class="span4" readonly="readonly"/>
+        </div>
+      </div>
+    </div>
+    <%=f.error_span(:date_heure_debut) %>
   </div>
-  <div class="field">
-    <%= f.label :surveillance %><br>
-    <%= f.check_box :surveillance %>
-  </div>
-  <div class="field">
-    <%= f.label :specialite %><br>
-    <%= f.check_box :specialite %>
-  </div>
-  <div class="field">
-    <%= f.label :notes %><br>
-    <%= f.text_area :notes %>
-  </div>
-  <div class="field">
-    <%= f.label :statut %><br>
-    <%= f.select(:statut,[['Disponible','disponible'],['Attribué','attribue']]) %>
-  </div>
-  <div class="actions">
 
-    <%= f.submit %>
+  <%= f.hidden_field :date_heure_debut, :value => get_date_heure_debut_format %>
+  <%= f.hidden_field :date_heure_fin, :value => get_date_heure_fin_format %>
+
+  <div class="form-group">
+    <%= f.label :surveillance, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-10">
+      <%= f.check_box :surveillance %>
+    </div>
+    <%=f.error_span(:surveillance) %>
   </div>
+  <div class="form-group">
+    <%= f.label :specialite, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-10">
+      <%= f.check_box :specialite %>
+    </div>
+    <%=f.error_span(:specialite) %>
+  </div>
+  <div class="form-group">
+    <%= f.label :notes, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-6">
+      <%= f.text_area :notes, :class => 'form-control' %>
+    </div>
+    <%=f.error_span(:notes) %>
+  </div>
+  <div class="form-group">
+    <%= f.label :statut, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-6">
+      <%= f.text_field :statut, :class => 'form-control', :disabled => 'disabled' %>
+    </div>
+    <%=f.error_span(:statut) %>
+  </div>
+
+  <div class="form-group">
+    <div class="col-lg-offset-2 col-lg-10">
+      <%= f.submit nil, :class => 'btn btn-primary' %>
+      <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                disponibilites_path, :class => 'btn btn-default' %>
+    </div>
+  </div>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('.datepicker').daterangepicker({
+                timePicker: true,
+                timePickerIncrement: 30,
+                format: 'YYYY/MM/DD h:mm A',
+                startDate: $('#disponibilite_date_heure_debut').val(),
+                endDate: $('#disponibilite_date_heure_fin').val()
+            }, function (start, end, label) {
+                $('#disponibilite_date_heure_debut').val(start.format('YYYY/MM/DD h:mm A'));
+                $('#disponibilite_date_heure_fin').val(end.format('YYYY/MM/DD h:mm A'));
+            });
+        });
+    </script>
+
 <% end %>

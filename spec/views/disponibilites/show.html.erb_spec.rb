@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "disponibilites/show" do
+describe "disponibilites_bck/show" do
   before(:each) do
     @disponibilite = assign(:disponibilite, stub_model(Disponibilite,
       :utilisateur_absent_id => 1,

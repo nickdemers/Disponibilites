@@ -1,64 +1,37 @@
-<p id="notice"><%= notice %></p>
+<%- model_class = Disponibilite -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.titleize %></h1>
+</div>
 
-<p>
-  <strong>Utilisateur absent:</strong>
-  <%= @disponibilite.utilisateur_absent_id %>
-</p>
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:utilisateur_absent_id) %>:</strong></dt>
+  <dd><%= @disponibilite.utilisateur_absent_id %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:utilisateur_remplacant_id) %>:</strong></dt>
+  <dd><%= get_utilisateur_remplacant_nom_format %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:endroit_id) %>:</strong></dt>
+  <dd><%= get_description_ecole(@disponibilite.endroit_id) %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:niveau_id) %>:</strong></dt>
+  <dd><%= get_description_niveau(@disponibilite.niveau_id) %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:date_heure_debut) %>:</strong></dt>
+  <dd><%= @disponibilite.date_heure_debut.strftime("%Y/%m/%d %H:%M") %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:date_heure_fin) %>:</strong></dt>
+  <dd><%= @disponibilite.date_heure_fin.strftime("%Y/%m/%d %H:%M") %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:surveillance) %>:</strong></dt>
+  <dd><%= @disponibilite.surveillance %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:specialite) %>:</strong></dt>
+  <dd><%= @disponibilite.specialite %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:notes) %>:</strong></dt>
+  <dd><%= @disponibilite.notes %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:statut) %>:</strong></dt>
+  <dd><%= get_description_statut(@disponibilite.statut) %></dd>
+</dl>
 
-<p>
-  <strong>Utilisateur remplacant:</strong>
-  <%= @disponibilite.utilisateur_remplacant_id %>
-</p>
-
-<p>
-  <strong>Endroit:</strong>
-  <%= @disponibilite.endroit_id %>
-</p>
-
-<p>
-  <strong>Niveau:</strong>
-  <%= @disponibilite.niveau_id %>
-</p>
-
-<p>
-  <strong>Date heure debut:</strong>
-  <%= @disponibilite.date_heure_debut %>
-</p>
-
-<p>
-  <strong>Date heure fin:</strong>
-  <%= @disponibilite.date_heure_fin %>
-</p>
-
-<p>
-  <strong>Surveillance:</strong>
-  <%= @disponibilite.surveillance %>
-</p>
-
-<p>
-  <strong>Specialite:</strong>
-  <%= @disponibilite.specialite %>
-</p>
-
-<p>
-  <strong>Notes:</strong>
-  <%= @disponibilite.notes %>
-</p>
-
-<p>
-  <strong>Statut:</strong>
-  <%= @disponibilite.statut %>
-</p>
-
-<p>
-  <strong>Created at:</strong>
-  <%= @disponibilite.created_at %>
-</p>
-
-<p>
-  <strong>Updated at:</strong>
-  <%= @disponibilite.updated_at %>
-</p>
-
-<%= link_to 'Edit', edit_disponibilite_path(@disponibilite) %> |
-<%= link_to 'Back', disponibilites_path %>
+<%= link_to t('.back', :default => t("helpers.links.back")),
+              disponibilites_path, :class => 'btn btn-default'  %>
+<%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_disponibilite_path(@disponibilite), :class => 'btn btn-default' %>
+<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              disponibilite_path(@disponibilite),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+              :class => 'btn btn-danger' %>
