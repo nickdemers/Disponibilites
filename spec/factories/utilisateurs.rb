@@ -3,28 +3,51 @@
 FactoryGirl.define do
   factory :utilisateur_permanent, :class => 'Utilisateur' do
     id {1}
-    courriel {"nickdemers@gmail.com"}
+    email {"nickdemers_permanent@gmail.com"}
     nom {"Demers permanent"}
     prenom {"Nicolas"}
     numero_telephone {"418 999-9999"}
     titre {"permanent"}
+    password {"12345678"}
+  end
+
+  factory :utilisateur_permanent2, :class => 'Utilisateur' do
+    id {4}
+    email {"nickdemers_permanent2@gmail.com"}
+    nom {"Demers permanent2"}
+    prenom {"Nicolas"}
+    numero_telephone {"418 999-9999"}
+    titre {"permanent"}
+    password {"12345678"}
   end
 
   factory :utilisateur_remplacant, :class => 'Utilisateur' do
     id {2}
-    courriel {"nickdemers@gmail.com"}
+    email {"nickdemers_remplacant@gmail.com"}
     nom {"Demers remplacant"}
     prenom {"Nicolas"}
     numero_telephone {"418 777-7777"}
     titre {"remplacant"}
+    password {"12345678"}
+  end
+
+  factory :utilisateur_remplacant2, :class => 'Utilisateur' do
+    id {5}
+    email {"nickdemers_remplacant2@gmail.com"}
+    nom {"Demers remplacant2"}
+    prenom {"Nicolas"}
+    numero_telephone {"418 777-7777"}
+    titre {"remplacant"}
+    password {"12345678"}
   end
 
   factory :utilisateur_remplacant_without_names, :class => 'Utilisateur' do
     id {3}
-    courriel {"nickdemers@gmail.com"}
+    email {"nickdemers_remplacant2@gmail.com"}
     nom {}
     prenom {}
     numero_telephone {"418 777-7777"}
     titre {"remplacant"}
+    password {"12345678"}
   end
 end

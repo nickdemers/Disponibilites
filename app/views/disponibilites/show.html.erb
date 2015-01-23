@@ -1,24 +1,22 @@
 <%- model_class = Disponibilite -%>
-<div class="page-header">
-  <h1><%=t '.title', :default => model_class.model_name.human.titleize %></h1>
-</div>
+<h1>Disponibilité</h1>
 
 <dl class="dl-horizontal">
   <dt><strong><%= model_class.human_attribute_name(:utilisateur_absent_id) %>:</strong></dt>
   <dd><%= @disponibilite.utilisateur_absent_id %></dd>
   <dt><strong><%= model_class.human_attribute_name(:utilisateur_remplacant_id) %>:</strong></dt>
   <dd><%= get_utilisateur_remplacant_nom_format %></dd>
-  <dt><strong><%= model_class.human_attribute_name(:endroit_id) %>:</strong></dt>
-  <dd><%= get_description_ecole(@disponibilite.endroit_id) %></dd>
+  <dt><strong>École:</strong></dt>
+  <dd><%= @disponibilite.ecole.nom %></dd>
   <dt><strong><%= model_class.human_attribute_name(:niveau_id) %>:</strong></dt>
   <dd><%= get_description_niveau(@disponibilite.niveau_id) %></dd>
-  <dt><strong><%= model_class.human_attribute_name(:date_heure_debut) %>:</strong></dt>
+  <dt><strong>Date heure début:</strong></dt>
   <dd><%= @disponibilite.date_heure_debut.strftime("%Y/%m/%d %H:%M") %></dd>
   <dt><strong><%= model_class.human_attribute_name(:date_heure_fin) %>:</strong></dt>
   <dd><%= @disponibilite.date_heure_fin.strftime("%Y/%m/%d %H:%M") %></dd>
   <dt><strong><%= model_class.human_attribute_name(:surveillance) %>:</strong></dt>
   <dd><%= @disponibilite.surveillance %></dd>
-  <dt><strong><%= model_class.human_attribute_name(:specialite) %>:</strong></dt>
+  <dt><strong>Spécialité:</strong></dt>
   <dd><%= @disponibilite.specialite %></dd>
   <dt><strong><%= model_class.human_attribute_name(:notes) %>:</strong></dt>
   <dd><%= @disponibilite.notes %></dd>
@@ -33,5 +31,5 @@
 <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
               disponibilite_path(@disponibilite),
               :method => 'delete',
-              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Êtes-vous certain ?')) },
               :class => 'btn btn-danger' %>

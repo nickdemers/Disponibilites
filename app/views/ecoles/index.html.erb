@@ -1,0 +1,35 @@
+<h1>Liste des écoles</h1>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Nom</th>
+      <th>Adresse</th>
+      <th>Numéro téléphone</th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @ecoles.each do |ecole| %>
+      <tr>
+        <td><%= link_to ecole.id, ecole_path(ecole) %></td>
+        <td><%= ecole.nom %></td>
+        <td><%= ecole.adresse %></td>
+        <td><%= ecole.numero_telephone %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_ecole_path(ecole), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      ecole_path(ecole),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Êtes-vous certain ?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New École', new_ecole_path %>

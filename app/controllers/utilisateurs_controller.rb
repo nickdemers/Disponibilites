@@ -1,4 +1,5 @@
 class UtilisateursController < ApplicationController
+  before_action :authenticate_utilisateur!
   before_action :set_utilisateur, only: [:show, :edit, :update, :destroy]
   before_action :set_disponibilites_avenir, only: [:index, :show, :new, :edit]
 
@@ -41,10 +42,13 @@ class UtilisateursController < ApplicationController
   # POST /utilisateurs.json
   def create
     @utilisateur = Utilisateur.new(utilisateur_params)
-
     respond_to do |format|
+      if params[:utilisateur][:password].blank?
+        params[:utilisateur].delete(:password)
+        params[:utilisateur].delete(:password_confirmation)
+      end
       if @utilisateur.save
-        format.html { redirect_to @utilisateur, notice: 'utilisateurs was successfully created.' }
+        format.html { redirect_to @utilisateur, notice: t("utilisateur.messages.save_creation_succes") }
         format.json { render json: @utilisateur, status: :created, location: @utilisateur }
       else
         set_disponibilites_avenir
@@ -59,8 +63,14 @@ class UtilisateursController < ApplicationController
   # PUT /utilisateurs/1.json
   def update
     respond_to do |format|
+      if params[:utilisateur][:password].blank?
+        params[:utilisateur].delete(:password)
+        params[:utilisateur].delete(:password_confirmation)
+      #else
+      #  @utilisateur.password = params[:utilisateur][:password]
+      end
       if @utilisateur.update(utilisateur_params)
-        format.html { redirect_to @utilisateur, notice: 'utilisateurs was successfully updated.' }
+        format.html { redirect_to @utilisateur, notice: t("utilisateur.messages.save_modification_succes") }
         format.json { head :no_content }
       else
         set_disponibilites_avenir
@@ -92,6 +102,6 @@ class UtilisateursController < ApplicationController
     end
 
     def utilisateur_params
-      params.require(:utilisateur).permit(:courriel, :message_texte_permis, :niveau, :nom, :numero_cellulaire, :numero_telephone, :prenom, :titre)
+      params.require(:utilisateur).permit(:email, :message_texte_permis, :niveau, :nom, :numero_cellulaire, :numero_telephone, :prenom, :titre, :password, :role_ids)
     end
 end

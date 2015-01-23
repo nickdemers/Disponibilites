@@ -25,7 +25,7 @@ describe UtilisateursHelper do
       description.should eq("")
     end
   end
-=begin
+
   describe "get description niveau" do
     it "with id and contain key" do
       description = get_description_niveau(3)
@@ -40,5 +40,4 @@ describe UtilisateursHelper do
       description.should eq("")
     end
   end
-=end
 end

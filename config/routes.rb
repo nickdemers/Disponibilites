@@ -1,15 +1,32 @@
 Disponibilites::Application.routes.draw do
+
+  resources :ecoles
+
+  #devise_for :utilisateurs, :controllers => { sessions: "utilisateurs/sessions", registrations: "utilisateurs/registrations" }
+  devise_for :utilisateurs, :controllers => { sessions: "utilisateurs/sessions", passwords: "utilisateurs/passwords" }
+  #devise_for :utilisateurs
+  #devise_scope :utilisateurs do
+  #  get '/login' => 'utilisateurs/sessions#new'
+  #  get '/logout' => 'utilisateurs/sessions#destroy'
+  #end
+  #resources :utilisateurs, :controller => "utilisateur"
+
+  #devise_scope :utilisateurs do
+  #  get '/reset_password' => "utilisateurs/passwords#new", :as => :reset_password
+  #end
+
+  resources :roles
+
   resources :niveaus
 
   resources :endroits
 
   resources :disponibilites do
     collection do
-      get "for_calendar"#..., defaults: { format: 'json' }
+      get "for_calendar"
     end
   end
 
-  resources :remplacements
   resources :utilisateurs
 
   # The priority is based upon order of creation: first created -> highest priority.
@@ -20,7 +37,7 @@ Disponibilites::Application.routes.draw do
   #root to: 'home#index'
   root 'home#index'
 
-  get "/auth/:provider/callback" => "sessions#create"
+  #get "/auth/:provider/callback" => "sessions#create"
 
   # You can have the root of your site routed with "root"
   # root 'welcome#index'

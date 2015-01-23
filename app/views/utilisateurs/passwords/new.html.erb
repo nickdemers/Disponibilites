@@ -1,0 +1,31 @@
+<body class='contrast-blue login contrast-background'>
+  <div class='middle-container'>
+    <div class='middle-row'>
+      <div class='middle-wrapper'>
+        <div class='login-container'>
+          <div class='container'>
+            <div class='row'>
+              <div class='col-sm-4 col-sm-offset-4'>
+                <h1 class='text-center title'>Vous avez oublié votre mot de passe ?</h1>
+
+                <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post, :class => "validate-form" }) do |f| %>
+                  <%= devise_error_messages! %>
+
+                  <div class="controls with-icon-over-input">
+                    <%= f.label :email, "Courriel" %><br />
+                    <%= f.email_field :email, autofocus: true %>
+                  </div>
+                  <br />
+                  <div class="actions">
+                    <%= f.submit "Réinitialiser mon mot de passe" %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<% #render "devise/shared/links" %>

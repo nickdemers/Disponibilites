@@ -10,7 +10,7 @@
 //= require daterangepicker
 //= #require_tree
 //= #require jquery
-//= #require jquery_ujs
+//= require jquery_ujs
 //= #require twitter/bootstrap
 //= #require moment
 //= #require daterangepicker

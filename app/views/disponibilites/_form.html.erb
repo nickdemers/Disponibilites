@@ -3,7 +3,7 @@
   <% if @disponibilite.errors.any? %>
     <div id="error_expl" class="panel panel-danger">
       <div class="panel-heading">
-        <h3 class="panel-title"><%= pluralize(@disponibilite.errors.count, "error") %> prohibited this disponibilite from being saved:</h3>
+        <h3 class="panel-title"><%= pluralize(@disponibilite.errors.count, "erreur empêche", "erreurs empêchent") %> <%= t("disponibilite.erreurs.save_disponibilite") %></h3>
       </div>
       <div class="panel-body">
         <ul>
@@ -23,18 +23,18 @@
     <%=f.error_span(:utilisateur_absent_id) %>
   </div>
   <div class="form-group">
-    <%= f.label :utilisateur_remplacant_id, :class => 'control-label col-lg-2' %>
+    <%= f.label :utilisateur_remplacant_id, "Utilisateur remplaçant", :class => 'control-label col-lg-2' %>
     <div class="col-lg-6">
       <%= f.text_field :utilisateur_remplacant_id, :value => get_utilisateur_remplacant_nom_format, :class => 'form-control', :disabled => 'disabled' %>
     </div>
     <%=f.error_span(:utilisateur_remplacant_id) %>
   </div>
   <div class="form-group">
-    <%= f.label :endroit_id, :class => 'control-label col-lg-2' %>
+    <%= f.label :ecole_id, "École", :class => 'control-label col-lg-2' %>
     <div class="col-lg-6">
-      <%= f.select(:endroit_id, DisponibilitesHelper::LISTE_ECOLE, {include_blank: ''}, :class => 'form-control') %>
+      <%= f.select(:ecole_id, Ecole.all.collect {|p| [ p.nom, p.id ] }, {include_blank: ''}, :class => 'form-control') %>
     </div>
-    <%=f.error_span(:endroit_id) %>
+    <%=f.error_span(:ecole_id) %>
   </div>
   <div class="form-group">
     <%= f.label :niveau_id, :class => 'control-label col-lg-2' %>
@@ -67,7 +67,7 @@
     <%=f.error_span(:surveillance) %>
   </div>
   <div class="form-group">
-    <%= f.label :specialite, :class => 'control-label col-lg-2' %>
+    <%= f.label :specialite, "Spécialité", :class => 'control-label col-lg-2' %>
     <div class="col-lg-10">
       <%= f.check_box :specialite %>
     </div>

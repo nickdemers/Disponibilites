@@ -3,10 +3,3 @@
 
 en:
   hello: "Hello world"
-  niveau:
-    1: "1ere annee"
-    2: "2e annee"
-    3: "3e annee"
-    4: "4e annee"
-    5: "5e annee"
-    6: "6e annee"

@@ -3,47 +3,44 @@ require 'spec_helper'
 
 describe HomeController do
   #routes { HomeController::Engine.routes }
-  describe "Menu avec des disponibilités" do
-    before(:each) do
-      disponibilite_dispo = FactoryGirl.create(:disponibilite_disponible)
-      Disponibilite.stub_chain(:where).and_return(disponibilite_dispo)
+  describe "valid session" do
+    describe "Menu avec des disponibilités" do
+      it "utilisateur connecté, afficher le contenu" do
+        utilisateur_session = double('utilisateur')
+        allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+
+        disponibilite_dispo = FactoryGirl.create(:disponibilite_disponible)
+        Disponibilite.stub_chain(:where).and_return(disponibilite_dispo)
+
+        disponibilite = create(:disponibilite_disponible)
+
+        allow(Disponibilite).to receive(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) {disponibilite}
+        allow(disponibilite).to receive(:order).with("date_heure_debut") {disponibilite}
+        allow(disponibilite).to receive(:first).with(10) {disponibilite}
+
+        allow(Disponibilite).to receive(:all) {[disponibilite]}
+
+        get 'index'
+
+      end
     end
+    describe "Menu sans disponibilité" do
+      it "utilisateur connecté, afficher le contenu" do
+        utilisateur_session = double('utilisateur')
+        allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
 
-    it "utilisateur non connecté, rediriger vers la page de loggin" do
-      #routes { HomeController::Engine.routes }
-      get 'index'
+        allow(Disponibilite).to receive(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) {nil}
+        allow(Disponibilite).to receive(:all) {[nil]}
 
-      #response.should redirect_to "/auth/google_oauth2"
-    end
-
-    it "utilisateur connecté, afficher le contenu" do
-      #session = new Session
-
-      #routes { HomeController::Engine.routes }
-      get 'index'
-
-      #response.should redirect_to "/auth/google_oauth2"
+        get 'index'
+      end
     end
   end
-  describe "Menu sans disponibilité" do
-    before(:each) do
-      Disponibilite.stub_chain(:where).and_return(nil)
-    end
+  it "invalid session" do
+    allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
 
-    it "utilisateur non connecté, rediriger vers la page de loggin" do
-      #routes { HomeController::Engine.routes }
-      get 'index'
+    get 'index'
 
-      #response.should redirect_to "/auth/google_oauth2"
-    end
-
-    it "utilisateur connecté, afficher le contenu" do
-      #session = new Session
-
-      #routes { HomeController::Engine.routes }
-      get 'index'
-
-      #response.should redirect_to "/auth/google_oauth2"
-    end
+    response.should redirect_to(new_utilisateur_session_path)
   end
 end

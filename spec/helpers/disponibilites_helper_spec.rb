@@ -121,21 +121,25 @@ describe DisponibilitesHelper do
         disponibilite = build(:disponibilite_disponible)
         Disponibilite.stub_chain(:where, :order, :first).and_return(disponibilite)
         liste_disponibilites = get_disponibilites_avenir_non_attribue
+        liste_disponibilites.should_not be_nil
       end
       it "with params Date" do
         disponibilite = build(:disponibilite_disponible)
         Disponibilite.stub_chain(:where, :order, :first).and_return(disponibilite)
         liste_disponibilites = get_disponibilites_avenir_non_attribue(Date.current + 1.days, Date.current + 2.days)
+        liste_disponibilites.should_not be_nil
       end
     end
     describe "disponibilites not finded" do
       it "without params Date" do
-        Disponibilite.stub(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}).and_return(nil)
+        allow(Disponibilite).to receive(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) {nil}
         liste_disponibilites = get_disponibilites_avenir_non_attribue
+        liste_disponibilites.should be_nil
       end
       it "with params Date" do
-        Disponibilite.stub(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current + 1.days, :date_fin=> Date.current + 2.days}).and_return(nil)
+        allow(Disponibilite).to receive(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) {nil}
         liste_disponibilites = get_disponibilites_avenir_non_attribue(Date.current + 1.days, Date.current + 2.days)
+        liste_disponibilites.should be_nil
       end
     end
   end

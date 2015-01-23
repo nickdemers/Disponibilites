@@ -23,182 +23,288 @@ describe UtilisateursController do
   # This should return the minimal set of attributes required to create a valid
   # Utilisateur. As you add validations to Utilisateur, be sure to
   # adjust the attributes here as well.
-  let(:valid_attributes) { { "courriel" => "utilisateur@courriel.ca", "nom" => "Nom", "prenom" => "Prénom", "numero_telephone" => "444 444-4444", "titre" => "Permanent" } }
-
-  # This should return the minimal set of values that should be in the session
-  # in order to pass any filters (e.g. authentication) defined in
-  # UtilisateursController. Be sure to keep this updated too.
-  let(:valid_session) { {} }
+  let(:valid_attributes) { { "email" => "utilisateur@courriel.ca", "nom" => "Nom", "prenom" => "Prénom", "numero_telephone" => "444 444-4444", "titre" => "Permanent", "password" => "12345678" } }
+  let(:valid_attributes_without_password) { { "email" => "utilisateur@courriel.ca", "nom" => "Nom", "prenom" => "Prénom", "numero_telephone" => "444 444-4444", "titre" => "Permanent" } }
 
   describe "GET index" do
-    it "assigns all utilisateurs as @utilisateurs" do
-      Disponibilite.stub(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}).and_return(nil)
+    describe "valid session" do
+      it "assigns all utilisateurs as @utilisateurs" do
+        utilisateur_session = double('utilisateur')
+        allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
 
-      utilisateur = create(:utilisateur_permanent)
-      Utilisateur.stub(:all).and_return([utilisateur])
+        utilisateur = create(:utilisateur_permanent)
 
-      get :index, {}, valid_session
-      assigns(:utilisateurs).should eq([utilisateur])
+        allow(Disponibilite).to receive(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) {nil}
+
+        allow(Utilisateur).to receive(:all) {[utilisateur]}
+
+        get :index, {}
+        assigns(:utilisateurs).should eq([utilisateur])
+      end
+    end
+    it "invalid session" do
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+
+      get :index, {}
+
+      response.should redirect_to(new_utilisateur_session_path)
     end
   end
 
   describe "GET show" do
-    it "assigns the requested utilisateur as @utilisateur" do
-      Disponibilite.stub(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}).and_return(nil)
+    describe "valid session" do
+      it "assigns the requested utilisateur as @utilisateur" do
+        utilisateur_session = double('utilisateur')
+        allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+
+        allow(Disponibilite).to receive(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) {nil}
+
+        utilisateur = create(:utilisateur_permanent)
+        allow(Utilisateur).to receive(:find).with(utilisateur.id.to_s) {utilisateur}
+
+        get :show, {:id => utilisateur}
+        assigns(:utilisateur).should eq(utilisateur)
+      end
+    end
+    it "invalid session" do
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
 
       utilisateur = create(:utilisateur_permanent)
-      Utilisateur.stub(:find).with(utilisateur.id.to_s).and_return(utilisateur)
+      get :show, {:id => utilisateur}
 
-      get :show, {:id => utilisateur}, valid_session
-      assigns(:utilisateur).should eq(utilisateur)
+      response.should redirect_to(new_utilisateur_session_path)
     end
   end
 
   describe "GET new" do
-    it "assigns a new utilisateur as @utilisateur" do
-      Disponibilite.stub(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}).and_return(nil)
+    describe "valid session" do
+      it "assigns a new utilisateur as @utilisateur" do
+        utilisateur_session = double('utilisateur')
+        allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
 
-      get :new, {}, valid_session
-      assigns(:utilisateur).should be_a_new(Utilisateur)
+        allow(Disponibilite).to receive(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) {nil}
+
+        get :new, {}
+        assigns(:utilisateur).should be_a_new(Utilisateur)
+      end
+    end
+    it "invalid session" do
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+
+      get :new, {}
+
+      response.should redirect_to(new_utilisateur_session_path)
     end
   end
 
   describe "GET edit" do
-    it "assigns the requested utilisateur as @utilisateur" do
-      Disponibilite.stub(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}).and_return(nil)
+    describe "valid session" do
+      it "assigns the requested utilisateur as @utilisateur" do
+        utilisateur_session = double('utilisateur')
+        allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
 
+        allow(Disponibilite).to receive(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) {nil}
+
+        utilisateur = create(:utilisateur_permanent)
+        allow(Utilisateur).to receive(:find).with(utilisateur.id.to_s) {utilisateur}
+
+        get :edit, {:id => utilisateur.to_param}
+        assigns(:utilisateur).should eq(utilisateur)
+      end
+    end
+    it "invalid session" do
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
       utilisateur = create(:utilisateur_permanent)
-      Utilisateur.stub(:find).with(utilisateur.id.to_s).and_return(utilisateur)
 
-      get :edit, {:id => utilisateur.to_param}, valid_session
-      assigns(:utilisateur).should eq(utilisateur)
+      get :edit, {:id => utilisateur.to_param}
+
+      response.should redirect_to(new_utilisateur_session_path)
     end
   end
 
   describe "POST create" do
-    describe "with valid params" do
-      #it "creates a new Utilisateur" do
-      #  utilisateur = create(:utilisateur_permanent)
-      #  Utilisateur.stub(:new).and_return(utilisateur)
-      #  expect {
-      #    post :create, {:utilisateur => valid_attributes}, valid_session
-      #  }.to change(Utilisateur, :count).by(1)
-      #end
-
-      it "assigns a newly created utilisateur as @utilisateur" do
-        utilisateur = create(:utilisateur_permanent)
-        Utilisateur.stub(:new).and_return(utilisateur)
-
-        utilisateur.stub(:save).and_return(true)
-
-        post :create, {:utilisateur => valid_attributes}, valid_session
-        assigns(:utilisateur).should be_a(Utilisateur)
-        assigns(:utilisateur).should be_persisted
-      end
-
-      #it "redirects to the created utilisateur" do
-      #  utilisateur = create(:utilisateur_permanent)
-      #  Utilisateur.stub(:new).and_return(utilisateur)
-
-      #  utilisateur.stub(:save).and_return(true)
-
-      #  post :create, {:utilisateur => valid_attributes}, valid_session
-      #  response.should redirect_to(Utilisateur.last)
-      #end
-    end
-
-    describe "with invalid params" do
+    describe "valid session" do
       before(:each) do
-        Disponibilite.stub(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}).and_return(nil)
+        utilisateur_session = double('utilisateur')
+        allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
       end
 
-      it "assigns a newly created but unsaved utilisateur as @utilisateur" do
-        #utilisateur = create(:utilisateur_permanent)
-        #Utilisateur.stub(:new).and_return(utilisateur)
+      describe "with valid params" do
 
-        # Trigger the behavior that occurs when invalid params are submitted
-        Utilisateur.any_instance.stub(:save).and_return(false)
-        post :create, {:utilisateur => valid_attributes}, valid_session
-        assigns(:utilisateur).should be_a_new(Utilisateur)
+        it "assigns a newly created utilisateur as @utilisateur" do
+          utilisateur = create(:utilisateur_permanent)
+          allow(Utilisateur).to receive(:new) {utilisateur}
+
+          utilisateur.stub(:save).and_return(true)
+          allow(utilisateur).to receive(:save) {true}
+
+          post :create, {:utilisateur => valid_attributes}
+          assigns(:utilisateur).should be_a(Utilisateur)
+          assigns(:utilisateur).should be_persisted
+        end
+
+        it "assigns a newly created utilisateur as @utilisateur without password" do
+          utilisateur = create(:utilisateur_permanent)
+          utilisateur.password= nil
+
+          allow(Utilisateur).to receive(:new) {utilisateur}
+
+          allow(utilisateur).to receive(:save) {true}
+
+          post :create, {:utilisateur => valid_attributes_without_password}
+          assigns(:utilisateur).should be_a(Utilisateur)
+          assigns(:utilisateur).should be_persisted
+        end
+
+        #it "redirects to the created utilisateur" do
+        #  utilisateur = create(:utilisateur_permanent)
+        #  Utilisateur.stub(:new).and_return(utilisateur)
+
+        #  utilisateur.stub(:save).and_return(true)
+
+        #  post :create, {:utilisateur => valid_attributes}
+        #  response.should redirect_to(Utilisateur.last)
+        #end
       end
 
-      it "re-renders the 'new' template" do
-        #utilisateur = create(:utilisateur_permanent)
-        #Utilisateur.stub(:new).and_return(utilisateur)
+      describe "with invalid params" do
+        before(:each) do
+          allow(Disponibilite).to receive(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) {nil}
+        end
 
-        # Trigger the behavior that occurs when invalid params are submitted
-        Utilisateur.any_instance.stub(:save).and_return(false)
-        post :create, {:utilisateur => valid_attributes}, valid_session
-        response.should render_template("new")
+        it "assigns a newly created but unsaved utilisateur as @utilisateur" do
+          # Trigger the behavior that occurs when invalid params are submitted
+          Utilisateur.any_instance.stub(:save).and_return(false)
+          post :create, {:utilisateur => valid_attributes}
+          assigns(:utilisateur).should be_a_new(Utilisateur)
+        end
+
+        it "re-renders the 'new' template" do
+          # Trigger the behavior that occurs when invalid params are submitted
+          Utilisateur.any_instance.stub(:save).and_return(false)
+          post :create, {:utilisateur => valid_attributes}
+          response.should render_template("new")
+        end
       end
+    end
+    it "invalid session" do
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+
+      post :create, {:utilisateur => valid_attributes}
+
+      response.should redirect_to(new_utilisateur_session_path)
     end
   end
 
   describe "PUT update" do
-    describe "with valid params" do
+    describe "valid session" do
       before(:each) do
-        @utilisateur = create(:utilisateur_permanent)
-        Utilisateur.stub(:find).with(@utilisateur.id.to_s).and_return(@utilisateur)
+        utilisateur_session = double('utilisateur')
+        allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
       end
 
-      it "updates the requested utilisateur" do
-        # Assuming there are no other utilisateurs in the database, this
-        # specifies that the Utilisateur created on the previous line
-        # receives the :update_attributes message with whatever params are
-        # submitted in the request.
-        Utilisateur.any_instance.should_receive(:update).with( valid_attributes).and_return(true)
-        put :update, {:id => @utilisateur.to_param, :utilisateur => valid_attributes}, valid_session
+      describe "with valid params" do
+        before(:each) do
+          @utilisateur = create(:utilisateur_permanent)
+          allow(Utilisateur).to receive(:find).with(@utilisateur.id.to_s) {@utilisateur}
+        end
+
+        it "updates the requested utilisateur" do
+          # Assuming there are no other utilisateurs in the database, this
+          # specifies that the Utilisateur created on the previous line
+          # receives the :update_attributes message with whatever params are
+          # submitted in the request.
+          Utilisateur.any_instance.should_receive(:update).with( valid_attributes).and_return(true)
+          put :update, {:id => @utilisateur.to_param, :utilisateur => valid_attributes}
+        end
+
+        it "updates the requested utilisateur without password" do
+          @utilisateur.password= nil
+          # Assuming there are no other utilisateurs in the database, this
+          # specifies that the Utilisateur created on the previous line
+          # receives the :update_attributes message with whatever params are
+          # submitted in the request.
+          Utilisateur.any_instance.should_receive(:update).with( valid_attributes_without_password).and_return(true)
+          put :update, {:id => @utilisateur.to_param, :utilisateur => valid_attributes_without_password}
+
+        end
+
+        it "assigns the requested utilisateur as @utilisateur" do
+          put :update, {:id => @utilisateur.to_param, :utilisateur => valid_attributes}
+          assigns(:utilisateur).should eq(@utilisateur)
+        end
+
+        it "redirects to the utilisateur" do
+          put :update, {:id => @utilisateur.to_param, :utilisateur => valid_attributes}
+          response.should redirect_to(@utilisateur)
+        end
       end
 
-      it "assigns the requested utilisateur as @utilisateur" do
-        put :update, {:id => @utilisateur.to_param, :utilisateur => valid_attributes}, valid_session
-        assigns(:utilisateur).should eq(@utilisateur)
-      end
+      describe "with invalid params" do
+        before(:each) do
+          allow(Disponibilite).to receive(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) {nil}
 
-      it "redirects to the utilisateur" do
-        put :update, {:id => @utilisateur.to_param, :utilisateur => valid_attributes}, valid_session
-        response.should redirect_to(@utilisateur)
+          @utilisateur = create(:utilisateur_permanent)
+          allow(Utilisateur).to receive(:find).with(@utilisateur.id.to_s) {@utilisateur}
+        end
+
+        it "assigns the utilisateur as @utilisateur" do
+          # Trigger the behavior that occurs when invalid params are submitted
+          Utilisateur.any_instance.stub(:save).and_return(false)
+          put :update, {:id => @utilisateur.to_param, :utilisateur => valid_attributes}
+          assigns(:utilisateur).should eq(@utilisateur)
+        end
+
+        it "re-renders the 'edit' template" do
+          # Trigger the behavior that occurs when invalid params are submitted
+          Utilisateur.any_instance.stub(:save).and_return(false)
+          put :update, {:id => @utilisateur.to_param, :utilisateur => valid_attributes}
+          response.should render_template("edit")
+        end
       end
     end
+    it "invalid session" do
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+      @utilisateur = create(:utilisateur_permanent)
 
-    describe "with invalid params" do
-      before(:each) do
-        Disponibilite.stub(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}).and_return(nil)
+      put :update, {:id => @utilisateur.to_param, :utilisateur => valid_attributes}
 
-        @utilisateur = create(:utilisateur_permanent)
-        Utilisateur.stub(:find).with(@utilisateur.id.to_s).and_return(@utilisateur)
-      end
-
-      it "assigns the utilisateur as @utilisateur" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Utilisateur.any_instance.stub(:save).and_return(false)
-        put :update, {:id => @utilisateur.to_param, :utilisateur => valid_attributes}, valid_session
-        assigns(:utilisateur).should eq(@utilisateur)
-      end
-
-      it "re-renders the 'edit' template" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Utilisateur.any_instance.stub(:save).and_return(false)
-        put :update, {:id => @utilisateur.to_param, :utilisateur => valid_attributes}, valid_session
-        response.should render_template("edit")
-      end
+      response.should redirect_to(new_utilisateur_session_path)
     end
   end
 
   describe "DELETE destroy" do
-    before(:each) do
-      @utilisateur = create(:utilisateur_permanent)
-      Utilisateur.stub(:find).with(@utilisateur.id.to_s).and_return(@utilisateur)
-    end
-    #it "destroys the requested utilisateur" do
-    #  expect {
-    #    delete :destroy, {:id => @utilisateur.to_param}, valid_session
-    #  }.to change(Utilisateur, :count).by(-1)
-    #end
+    describe "valid session" do
+      before(:each) do
+        utilisateur_session = double('utilisateur')
+        allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+      end
 
-    it "redirects to the utilisateurs list" do
-      delete :destroy, {:id => @utilisateur.to_param}, valid_session
-      response.should redirect_to(utilisateurs_url)
+      #it "destroys the requested utilisateur" do
+      #  expect {
+      #    delete :destroy, {:id => @utilisateur.to_param}
+      #  }.to change(Utilisateur, :count).by(-1)
+      #end
+
+      it "redirects to the utilisateurs list" do
+        @utilisateur = create(:utilisateur_permanent)
+        allow(Utilisateur).to receive(:find).with(@utilisateur.id.to_s) {@utilisateur}
+
+        allow(Disponibilite).to receive(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) {nil}
+
+        delete :destroy, {:id => @utilisateur.to_param}
+        response.should redirect_to(utilisateurs_url)
+      end
+    end
+    it "invalid session" do
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+      @utilisateur = create(:utilisateur_permanent)
+
+      allow(Disponibilite).to receive(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) {nil}
+
+      delete :destroy, {:id => @utilisateur.to_param}
+
+      response.should redirect_to(new_utilisateur_session_path)
     end
   end
 end

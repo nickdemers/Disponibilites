@@ -3,7 +3,7 @@
   <% if @utilisateur.errors.any? %>
     <div id="error_expl" class="panel panel-danger">
       <div class="panel-heading">
-        <h3 class="panel-title"><%= pluralize(@utilisateur.errors.count, "error") %> prohibited this utilisateur from being saved:</h3>
+        <h3 class="panel-title"><%= pluralize(@utilisateur.errors.count, "erreur empêche", "erreurs empêchent") %> <%= t("utilisateur.erreurs.save_utilisateur") %></h3>
       </div>
       <div class="panel-body">
         <ul>
@@ -23,18 +23,18 @@
     <%=f.error_span(:nom) %>
   </div>
   <div class="form-group">
-    <%= f.label :prenom, :class => 'control-label col-lg-2' %>
+    <%= f.label :prenom, "Prénom", :class => 'control-label col-lg-2' %>
     <div class="col-lg-10">
       <%= f.text_field :prenom, :class => 'form-control' %>
     </div>
     <%=f.error_span(:prenom) %>
   </div>
   <div class="form-group">
-    <%= f.label :courriel, :class => 'control-label col-lg-2' %>
+    <%= f.label :email, "Courriel", :class => 'control-label col-lg-2' %>
     <div class="col-lg-10">
-      <%= f.text_field :courriel, :class => 'form-control' %>
+      <%= f.email_field :email, :class => 'form-control' %>
     </div>
-    <%=f.error_span(:courriel) %>
+    <%=f.error_span(:email) %>
   </div>
   <div class="form-group">
     <%= f.label :titre, :class => 'control-label col-lg-2' %>
@@ -44,16 +44,16 @@
     <%=f.error_span(:titre) %>
   </div>
   <div class="form-group">
-    <%= f.label :numero_telephone, :class => 'control-label col-lg-2' %>
+    <%= f.label :numero_telephone, "Numéro de téléphone", :class => 'control-label col-lg-2' %>
     <div class="col-lg-10">
-      <%= f.text_field :numero_telephone, :class => 'form-control' %>
+      <%= f.telephone_field :numero_telephone, :class => 'form-control', autocomplete: "off" %>
     </div>
     <%=f.error_span(:numero_telephone) %>
   </div>
   <div class="form-group">
-    <%= f.label :numero_cellulaire, :class => 'control-label col-lg-2' %>
+    <%= f.label :numero_cellulaire, "Numéro de cellulaire", :class => 'control-label col-lg-2' %>
     <div class="col-lg-10">
-      <%= f.text_field :numero_cellulaire, :class => 'form-control' %>
+      <%= f.telephone_field :numero_cellulaire, :class => 'form-control', autocomplete: "off" %>
     </div>
     <%=f.error_span(:numero_cellulaire) %>
   </div>
@@ -71,12 +71,36 @@
     </div>
     <%=f.error_span(:niveau) %>
   </div>
-
+  <% if current_utilisateur.role? :admin or current_utilisateur.id.equal?(@utilisateur.id) %>
+     <div class="form-group">
+        <%= f.label :password, "Mot de passe", :class => 'control-label col-lg-2' %>
+        <div class="col-lg-10">
+          <%=  f.password_field :password, autocomplete: "off" %>
+        </div>
+        <%= f.error_span(:password) %>
+      </div>
+    <div class="form-group">
+      <%= f.label :password_confirmation, "Confirmer mot de passe", :class => 'control-label col-lg-2' %><br />
+      <div class="col-lg-10">
+        <%= f.password_field :password_confirmation, autocomplete: "off" %>
+      </div>
+      <%= f.error_span(:password_confirmation) %>
+    </div>
+  <% end %>
+  <% if current_utilisateur.role? :admin %>
+      <div class="form-group">
+        <%= f.label :roles, "Rôle", :class => 'control-label col-lg-2' %>
+        <div class="col-lg-10">
+          <%= f.select(:role_ids, Role.all.collect {|p| [ p.nom, p.id ] }) %>
+        </div>
+        <%=f.error_span(:roles) %>
+      </div>
+  <% end %>
   <div class="form-group">
     <div class="col-lg-offset-2 col-lg-10">
       <%= f.submit nil, :class => 'btn btn-primary' %>
       <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
-                utilisateurs_path, :class => 'btn btn-default' %>
+                    utilisateurs_path, :class => 'btn btn-default' %>
     </div>
   </div>
 

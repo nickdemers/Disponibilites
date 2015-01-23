@@ -10,12 +10,12 @@ module DisponibiliteValidations
 
   # Checks that the equipment model is available from start date to due date
   def disponible
-    # do not run on reservations that don't matter anymore
+    # do not run on disponibilite that don't matter anymore
     return unless utilisateur_remplacant_id && date_heure_debut && date_heure_fin
     return if self.statut == "attribue" || date_heure_fin < DateTime.now
-    if Disponibilite.where("utilisateur_remplacant_id = :utilisateur_remplacant_id and (:date_heure_debut between date_heure_debut " +
-                               "and date_heure_fin OR :date_heure_fin between date_heure_debut and date_heure_fin)",
-                           {utilisateur_remplacant_id: utilisateur_remplacant_id, date_heure_debut: date_heure_debut,
+    if Disponibilite.where("utilisateur_remplacant_id = :utilisateur_remplacant_id and id != :disponibilite_id and (:date_heure_debut between date_heure_debut " +
+                           "and date_heure_fin OR :date_heure_fin between date_heure_debut and date_heure_fin)",
+                           {utilisateur_remplacant_id: utilisateur_remplacant_id, disponibilite_id: id, date_heure_debut: date_heure_debut,
                             date_heure_fin: date_heure_fin}).any?
       errors.add(:base, "L'utilisateur remplaçant a déjà un remplacement dans ces heures.\n")
     end

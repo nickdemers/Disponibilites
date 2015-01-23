@@ -1,0 +1,47 @@
+<%= form_for(@ecole, :html => { :class => "form-horizontal ecole" }) do |f| %>
+
+  <% if @ecole.errors.any? %>
+    <div id="error_expl" class="panel panel-danger">
+      <div class="panel-heading">
+        <h3 class="panel-title"><%= pluralize(@ecole.errors.count, "erreur empêche", "erreurs empêchent") %> <%= t("ecole.erreurs.save_ecole") %></h3>
+      </div>
+      <div class="panel-body">
+        <ul>
+          <% @ecole.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label :nom, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-6">
+      <%= f.text_field :nom, :class => 'form-control'%>
+    </div>
+    <%=f.error_span(:nom) %>
+  </div>
+  <div class="form-group">
+    <%= f.label :adresse, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-6">
+      <%= f.text_field :adresse, :class => 'form-control'%>
+    </div>
+    <%=f.error_span(:adresse) %>
+  </div>
+  <div class="form-group">
+    <%= f.label :numero_telephone, "Numéro téléphone", :class => 'control-label col-lg-2' %>
+    <div class="col-lg-6">
+      <%= f.text_field :numero_telephone, :class => 'form-control'%>
+    </div>
+    <%=f.error_span(:numero_telephone) %>
+  </div>
+
+  <div class="form-group">
+    <div class="col-lg-offset-2 col-lg-10">
+      <%= f.submit nil, :class => 'btn btn-primary' %>
+      <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                  ecoles_path, :class => 'btn btn-default' %>
+    </div>
+  </div>
+<% end %>

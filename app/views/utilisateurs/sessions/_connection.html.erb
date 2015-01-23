@@ -1,0 +1,85 @@
+<body class='contrast-blue login contrast-background'>
+    <div class='middle-container'>
+      <div class='middle-row'>
+        <div class='middle-wrapper'>
+          <div class='login-container'>
+            <div class='container'>
+              <div class='row'>
+                <div class='col-sm-4 col-sm-offset-4'>
+                  <h1 class='text-center title'>Connection</h1>
+                  <%= form_for(resource, as: resource_name, url: session_path(resource_name), :html => { :class => "validate-form" }) do |f| %>
+                      <p class="notice"><%= notice %></p>
+                      <p class="alert"><%= alert %></p>
+
+                      <div class="controls with-icon-over-input">
+                        <%= f.label :email, "Courriel" %><br />
+                        <%= f.email_field :email, autofocus: true, required: true %>
+                      </div>
+
+                      <div class="controls with-icon-over-input">
+                        <%= f.label :password, "Mot de passe" %><br />
+                        <%= f.password_field :password, autocomplete: "off" %>
+                      </div>
+
+                      <% if devise_mapping.rememberable? %>
+                          <div class="checkbox">
+                            <%= f.check_box :remember_me %>
+                            <%= f.label :remember_me, "Garder en mémoire" %>
+                          </div>
+                      <% end %>
+
+                      <div class="actions">
+                        <%= f.submit "Connecter" %>
+                      </div>
+
+                  <!--<form action='index.html' class='validate-form' method='get'>
+
+                    <div class='form-group'>
+                      <div class='controls with-icon-over-input'>
+                        <input value="" placeholder="E-mail" class="form-control" data-rule-required="true" name="email" type="text" />
+                        <i class='icon-user text-muted'></i>
+                      </div>
+                    </div>
+                    <div class='form-group'>
+                      <div class='controls with-icon-over-input'>
+                        <input value="" placeholder="Password" class="form-control" data-rule-required="true" name="password" type="password" />
+                        <i class='icon-lock text-muted'></i>
+                      </div>
+                    </div>
+                    <div class='checkbox'>
+                      <label for='remember_me'>
+                        <input id='remember_me' name='remember_me' type='checkbox' value='1'>
+                        Remember me
+                      </label>
+                    </div>
+                    <button class='btn btn-block'>Sign in</button>
+                 </form> -->
+                    <div class='text-center'>
+                      <hr class='hr-normal'>
+                      <%= link_to "Mot de passe oublié ?", new_password_path(resource_name) %>
+                    </div>
+                  <% end %>
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--<div class='login-container-footer'>
+            <div class='container'>
+              <div class='row'>
+                <div class='col-sm-12'>
+                  <div class='text-center'>
+                    <a href='sign_up.html'>
+                      <i class='icon-user'></i>
+                      Nouveau ?
+                      <strong>Créer votre compte</strong>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div> -->
+        </div>
+      </div>
+    </div>
+</body>

@@ -1,0 +1,21 @@
+<p id="notice"><%= notice %></p>
+<h1>Disponibilité</h1>
+
+<dl class="dl-horizontal">
+  <dt><strong>Nom:</strong></dt>
+  <dd><%= @ecole.nom %></dd>
+  <dt><strong>Adresse:</strong></dt>
+  <dd><%= @ecole.adresse %></dd>
+  <dt><strong>Numéro téléphone:</strong></dt>
+  <dd><%= @ecole.numero_telephone %></dd>
+</dl>
+
+<%= link_to t('.back', :default => t("helpers.links.back")),
+            ecoles_path, :class => 'btn btn-default'  %>
+<%= link_to t('.edit', :default => t("helpers.links.edit")),
+            edit_ecole_path(@ecole), :class => 'btn btn-default' %>
+<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+            ecole_path(@ecole),
+            :method => 'delete',
+            :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Êtes-vous certain ?')) },
+            :class => 'btn btn-danger' %>

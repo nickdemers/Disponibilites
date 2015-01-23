@@ -1,4 +1,5 @@
 class DisponibilitesController < ApplicationController
+  before_action :authenticate_utilisateur!
   before_action :set_disponibilite, only: [:show, :edit, :update, :destroy]
   before_action :set_disponibilites_avenir, only: [:index, :show, :new, :edit]
 
@@ -25,7 +26,7 @@ class DisponibilitesController < ApplicationController
 
     else
       respond_to do |format|
-        format.html { redirect_to disponibilites_url, alert: "Aucun utilisateur absent disponible." }
+        format.html { redirect_to disponibilites_url, alert: t("disponibilite.erreurs.aucun_utilisateur_absent_disponible") }
         format.json { head :no_content }
       end
     end
@@ -55,7 +56,7 @@ class DisponibilitesController < ApplicationController
 
     respond_to do |format|
       if @disponibilite.save
-        format.html { redirect_to @disponibilite, notice: 'Disponibilite was successfully created.' }
+        format.html { redirect_to @disponibilite, notice: t("disponibilite.messages.save_creation_succes") }
         format.json { render action: 'show', status: :created, location: @disponibilite }
       else
         set_disponibilites_avenir
@@ -70,7 +71,7 @@ class DisponibilitesController < ApplicationController
   def update
     respond_to do |format|
       if @disponibilite.update(disponibilite_params)
-        format.html { redirect_to @disponibilite, notice: 'Disponibilite was successfully updated.' }
+        format.html { redirect_to @disponibilite, notice: t("disponibilite.messages.save_modification_succes") }
         format.json { head :no_content }
       else
         set_disponibilites_avenir
