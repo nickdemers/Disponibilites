@@ -7,7 +7,7 @@ FactoryGirl.define do
     date_heure_fin {DateTime.now + 1.hour}
     statut {"disponible"}
     association :utilisateur_absent, factory: :utilisateur_permanent, strategy: :build
-    association :ecole, factory: :ecole, strategy: :build
+    association :ecole, factory: :ecole_test#, strategy: :build
   end
 
   factory :disponibilite_attribue, :class => 'Disponibilite' do
@@ -17,7 +17,7 @@ FactoryGirl.define do
     statut {"attribue"}
     association :utilisateur_absent, factory: :utilisateur_permanent, strategy: :build
     association :utilisateur_remplacant, factory: :utilisateur_remplacant, strategy: :build
-    association :ecole, factory: :ecole, strategy: :build
+    association :ecole, factory: :ecole#, strategy: :build
   end
 
   factory :disponibilite_attribue_with_same_remplacant, :class => 'Disponibilite' do
@@ -27,7 +27,7 @@ FactoryGirl.define do
     statut {"attribue"}
     association :utilisateur_absent, factory: :utilisateur_permanent2, strategy: :build
     association :utilisateur_remplacant, factory: :utilisateur_remplacant, strategy: :build
-    association :ecole, factory: :ecole, strategy: :build
+    association :ecole, factory: :ecole#, strategy: :build
   end
 
   factory :disponibilite_without_dates, :class => 'Disponibilite' do
@@ -37,6 +37,6 @@ FactoryGirl.define do
     statut {"attribue"}
     association :utilisateur_absent, factory: :utilisateur_permanent, strategy: :build
     association :utilisateur_remplacant, factory: :utilisateur_remplacant, strategy: :build
-    association :ecole, factory: :ecole, strategy: :build
+    association :ecole, factory: :ecole#, strategy: :build
   end
 end

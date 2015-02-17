@@ -15,7 +15,7 @@ describe Utilisateur do
       expect(utilisateur.role?('admin')).to eql(role)
     end
 
-    it "avec succès, rôle introuvalbe" do
+    it "avec succès, rôle introuvable" do
       role = Role.create({nom: 'admin'})
       utilisateur = Utilisateur.create({prenom: 'Nicolas', nom: 'Demers', message_texte_permis: 'non', niveau: 3, email: 'test@test.ca',
                                         numero_cellulaire: '418 999-8888', numero_telephone: '418 777-5555', titre: 'Permanent', password: '12345678', roles: [role]})

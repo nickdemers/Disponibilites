@@ -40,7 +40,7 @@ gem 'bcrypt-ruby'
 gem 'bcrypt', '~> 3.1.7'
 
 # Gem for validation if teacher is available
-#gem 'acts_as_bookable', git: 'git@github.com:groupefungo/acts_as_bookable'
+gem 'acts_as_bookable', git: 'git@github.com:groupefungo/acts_as_bookable'
 
 group :doc do
   # bundle exec rake doc:rails generates the API under doc/api.

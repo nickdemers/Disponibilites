@@ -23,7 +23,7 @@
         <td><%= link_to disponibilite.id, disponibilite_path(disponibilite) %></td>
         <td><%= disponibilite.utilisateur_absent.nom + ", " + disponibilite.utilisateur_absent.prenom %></td>
         <td><%= disponibilite.utilisateur_remplacant_id.nil? ? "" : disponibilite.utilisateur_remplacant.nom + ", " + disponibilite.utilisateur_remplacant.prenom  %></td>
-        <td><%= disponibilite.ecole_id %></td>
+        <td><%= disponibilite.ecole.nom %></td>
         <td><%= get_description_niveau(disponibilite.niveau_id) %></td>
         <td><%= disponibilite.date_heure_debut.strftime("%Y/%m/%d %H:%M") %></td>
         <td><%= disponibilite.date_heure_fin.strftime("%Y/%m/%d %H:%M") %></td>

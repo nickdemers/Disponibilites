@@ -50,4 +50,22 @@ FactoryGirl.define do
     titre {"remplacant"}
     password {"12345678"}
   end
+
+  factory :utilisateur, :class => 'Utilisateur' do
+    id {1}
+    email {"nickdemers_permanent@gmail.com"}
+    nom {"Demers permanent"}
+    prenom {"Nicolas"}
+    numero_telephone {"418 999-9999"}
+    titre {"permanent"}
+    password {"12345678"}
+    association :roles, factory: [:role]#, strategy: :build
+    #association :roles, [factory: :role]#, strategy: :build
+  end
+
+end
+
+Factory.define :utilisateur_is_admin, :parent => :utilisateur do |utilisateur|
+  utilisateur.after_create { |l| Factory(:role, :role => l)  }
+  #or some for loop to generate X features
 end

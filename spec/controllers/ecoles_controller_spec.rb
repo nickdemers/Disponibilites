@@ -28,133 +28,276 @@ describe EcolesController do
   # This should return the minimal set of values that should be in the session
   # in order to pass any filters (e.g. authentication) defined in
   # EcolesController. Be sure to keep this updated too.
-  let(:valid_session) { {} }
+  #let(:valid_session) { {} }
 
   describe "GET index" do
-    it "assigns all ecoles as @ecoles" do
-      ecole = Ecole.create! valid_attributes
-      get :index, {}, valid_session
-      assigns(:ecoles).should eq([ecole])
+    describe "valid session" do
+      it "assigns all ecoles as @ecoles" do
+        #utilisateur_session = double('utilisateur')
+        #allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+        role = Role.create({nom: 'admin'})
+        utilisateur = Utilisateur.create({prenom: 'Nicolas', nom: 'Demers', message_texte_permis: 'non', niveau: 3, email: 'test@test.ca',
+                                          numero_cellulaire: '418 999-8888', numero_telephone: '418 777-5555', titre: 'Permanent', password: '12345678', roles: [role]})
+        sign_in(utilisateur)
+
+        ecole = Ecole.create! valid_attributes
+
+        allow(Ecole).to receive(:all) {[ecole]}
+        get :index, {}
+        assigns(:ecoles).should eq([ecole])
+      end
+    end
+    it "invalid session" do
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+
+      get :index, {}
+
+      response.should redirect_to(new_utilisateur_session_path)
+
     end
   end
 
   describe "GET show" do
-    it "assigns the requested ecole as @ecole" do
+    describe "valid session" do
+      it "assigns the requested ecole as @ecole" do
+        #utilisateur_session = double('utilisateur')
+        #allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+        role = Role.create({nom: 'admin'})
+        utilisateur = Utilisateur.create({prenom: 'Nicolas', nom: 'Demers', message_texte_permis: 'non', niveau: 3, email: 'test@test.ca',
+                                          numero_cellulaire: '418 999-8888', numero_telephone: '418 777-5555', titre: 'Permanent', password: '12345678', roles: [role]})
+        sign_in(utilisateur)
+
+        ecole = Ecole.create! valid_attributes
+        allow(Ecole).to receive(:find).with(ecole.id.to_s) {ecole}
+
+        get :show, {:id => ecole.to_param}
+        assigns(:ecole).should eq(ecole)
+      end
+    end
+    it "invalid session" do
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+
       ecole = Ecole.create! valid_attributes
-      get :show, {:id => ecole.to_param}, valid_session
-      assigns(:ecole).should eq(ecole)
+      allow(Ecole).to receive(:find).with(ecole.id.to_s) {ecole}
+
+      get :show, {:id => ecole.to_param}
+
+      response.should redirect_to(new_utilisateur_session_path)
     end
   end
 
   describe "GET new" do
-    it "assigns a new ecole as @ecole" do
-      get :new, {}, valid_session
-      assigns(:ecole).should be_a_new(Ecole)
+    describe "valid session" do
+      it "assigns a new ecole as @ecole" do
+        utilisateur_session = double('utilisateur')
+        allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+
+        get :new, {}
+
+        assigns(:ecole).should be_a_new(Ecole)
+      end
+    end
+    it "invalid session" do
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+
+      get :new, {}
+
+      response.should redirect_to(new_utilisateur_session_path)
     end
   end
 
   describe "GET edit" do
-    it "assigns the requested ecole as @ecole" do
+    describe "valid session" do
+      it "assigns the requested ecole as @ecole" do
+        utilisateur_session = double('utilisateur')
+        allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+
+        ecole = Ecole.create! valid_attributes
+        allow(Ecole).to receive(:find).with(ecole.id.to_s) {ecole}
+
+        get :edit, {:id => ecole.to_param}
+        assigns(:ecole).should eq(ecole)
+      end
+    end
+    it "invalid session" do
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+
       ecole = Ecole.create! valid_attributes
-      get :edit, {:id => ecole.to_param}, valid_session
-      assigns(:ecole).should eq(ecole)
+      allow(Ecole).to receive(:find).with(ecole.id.to_s) {ecole}
+
+      get :edit, {:id => ecole.to_param}
+
+      response.should redirect_to(new_utilisateur_session_path)
     end
   end
 
   describe "POST create" do
-    describe "with valid params" do
-      it "creates a new Ecole" do
-        expect {
-          post :create, {:ecole => valid_attributes}, valid_session
-        }.to change(Ecole, :count).by(1)
+    describe "valid session" do
+      describe "with valid params" do
+        it "creates a new Ecole" do
+          utilisateur_session = double('utilisateur')
+          allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+
+          expect {
+            post :create, {:ecole => valid_attributes}
+          }.to change(Ecole, :count).by(1)
+        end
+
+        it "assigns a newly created ecole as @ecole" do
+          utilisateur_session = double('utilisateur')
+          allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+
+          post :create, {:ecole => valid_attributes}
+          assigns(:ecole).should be_a(Ecole)
+          assigns(:ecole).should be_persisted
+        end
+
+        it "redirects to the created ecole" do
+          utilisateur_session = double('utilisateur')
+          allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+
+          post :create, {:ecole => valid_attributes}
+          response.should redirect_to(Ecole.last)
+        end
       end
 
-      it "assigns a newly created ecole as @ecole" do
-        post :create, {:ecole => valid_attributes}, valid_session
-        assigns(:ecole).should be_a(Ecole)
-        assigns(:ecole).should be_persisted
-      end
+      describe "with invalid params" do
+        it "assigns a newly created but unsaved ecole as @ecole" do
+          utilisateur_session = double('utilisateur')
+          allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
 
-      it "redirects to the created ecole" do
-        post :create, {:ecole => valid_attributes}, valid_session
-        response.should redirect_to(Ecole.last)
+          # Trigger the behavior that occurs when invalid params are submitted
+          Ecole.any_instance.stub(:save).and_return(false)
+          post :create, {:ecole => { "nom" => "invalid value" }}
+          assigns(:ecole).should be_a_new(Ecole)
+        end
+
+        it "re-renders the 'new' template" do
+          utilisateur_session = double('utilisateur')
+          allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+
+          # Trigger the behavior that occurs when invalid params are submitted
+          Ecole.any_instance.stub(:save).and_return(false)
+          post :create, {:ecole => { "nom" => "invalid value" }}
+          response.should render_template("new")
+        end
       end
     end
+    it "invalid session" do
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
 
-    describe "with invalid params" do
-      it "assigns a newly created but unsaved ecole as @ecole" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Ecole.any_instance.stub(:save).and_return(false)
-        post :create, {:ecole => { "nom" => "invalid value" }}, valid_session
-        assigns(:ecole).should be_a_new(Ecole)
-      end
+      post :create, {:ecole => valid_attributes}
 
-      it "re-renders the 'new' template" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Ecole.any_instance.stub(:save).and_return(false)
-        post :create, {:ecole => { "nom" => "invalid value" }}, valid_session
-        response.should render_template("new")
-      end
+      response.should redirect_to(new_utilisateur_session_path)
     end
   end
 
   describe "PUT update" do
-    describe "with valid params" do
-      it "updates the requested ecole" do
-        ecole = Ecole.create! valid_attributes
-        # Assuming there are no other ecoles in the database, this
-        # specifies that the ecole created on the previous line
-        # receives the :update_attributes message with whatever params are
-        # submitted in the request.
-        Ecole.any_instance.should_receive(:update).with({ "nom" => "MyString" })
-        put :update, {:id => ecole.to_param, :ecole => { "nom" => "MyString" }}, valid_session
+    describe "valid session" do
+      describe "with valid params" do
+        it "updates the requested ecole" do
+          utilisateur_session = double('utilisateur')
+          allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+
+          ecole = Ecole.create! valid_attributes
+          # Assuming there are no other ecoles in the database, this
+          # specifies that the ecole created on the previous line
+          # receives the :update_attributes message with whatever params are
+          # submitted in the request.
+          allow(Ecole).to receive(:find).with(ecole.id.to_s) {ecole}
+          Ecole.any_instance.should_receive(:update).with({ "nom" => "MyString" })
+          put :update, {:id => ecole.to_param, :ecole => { "nom" => "MyString" }}
+        end
+
+        it "assigns the requested ecole as @ecole" do
+          utilisateur_session = double('utilisateur')
+          allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+
+          ecole = Ecole.create! valid_attributes
+          allow(Ecole).to receive(:find).with(ecole.id.to_s) {ecole}
+          put :update, {:id => ecole.to_param, :ecole => valid_attributes}
+          assigns(:ecole).should eq(ecole)
+        end
+
+        it "redirects to the ecole" do
+          utilisateur_session = double('utilisateur')
+          allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+
+          ecole = Ecole.create! valid_attributes
+          allow(Ecole).to receive(:find).with(ecole.id.to_s) {ecole}
+          put :update, {:id => ecole.to_param, :ecole => valid_attributes}
+          response.should redirect_to(ecole)
+        end
       end
 
-      it "assigns the requested ecole as @ecole" do
-        ecole = Ecole.create! valid_attributes
-        put :update, {:id => ecole.to_param, :ecole => valid_attributes}, valid_session
-        assigns(:ecole).should eq(ecole)
-      end
+      describe "with invalid params" do
+        it "assigns the ecole as @ecole" do
+          utilisateur_session = double('utilisateur')
+          allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
 
-      it "redirects to the ecole" do
-        ecole = Ecole.create! valid_attributes
-        put :update, {:id => ecole.to_param, :ecole => valid_attributes}, valid_session
-        response.should redirect_to(ecole)
+          ecole = Ecole.create! valid_attributes
+          allow(Ecole).to receive(:find).with(ecole.id.to_s) {ecole}
+          # Trigger the behavior that occurs when invalid params are submitted
+          Ecole.any_instance.stub(:save).and_return(false)
+          put :update, {:id => ecole.to_param, :ecole => { "nom" => "invalid value" }}
+          assigns(:ecole).should eq(ecole)
+        end
+
+        it "re-renders the 'edit' template" do
+          utilisateur_session = double('utilisateur')
+          allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+
+          ecole = Ecole.create! valid_attributes
+          allow(Ecole).to receive(:find).with(ecole.id.to_s) {ecole}
+          # Trigger the behavior that occurs when invalid params are submitted
+          Ecole.any_instance.stub(:save).and_return(false)
+          put :update, {:id => ecole.to_param, :ecole => { "nom" => "invalid value" }}
+          response.should render_template("edit")
+        end
       end
     end
+    it "invalid session" do
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
 
-    describe "with invalid params" do
-      it "assigns the ecole as @ecole" do
-        ecole = Ecole.create! valid_attributes
-        # Trigger the behavior that occurs when invalid params are submitted
-        Ecole.any_instance.stub(:save).and_return(false)
-        put :update, {:id => ecole.to_param, :ecole => { "nom" => "invalid value" }}, valid_session
-        assigns(:ecole).should eq(ecole)
-      end
+      ecole = Ecole.create! valid_attributes
+      allow(Ecole).to receive(:find).with(ecole.id.to_s) {ecole}
+      put :update, {:id => ecole.to_param, :ecole => valid_attributes}
 
-      it "re-renders the 'edit' template" do
-        ecole = Ecole.create! valid_attributes
-        # Trigger the behavior that occurs when invalid params are submitted
-        Ecole.any_instance.stub(:save).and_return(false)
-        put :update, {:id => ecole.to_param, :ecole => { "nom" => "invalid value" }}, valid_session
-        response.should render_template("edit")
-      end
+      response.should redirect_to(new_utilisateur_session_path)
     end
   end
 
   describe "DELETE destroy" do
-    it "destroys the requested ecole" do
-      ecole = Ecole.create! valid_attributes
-      expect {
-        delete :destroy, {:id => ecole.to_param}, valid_session
-      }.to change(Ecole, :count).by(-1)
-    end
+    describe "valid session" do
+      it "destroys the requested ecole" do
+        utilisateur_session = double('utilisateur')
+        allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
 
-    it "redirects to the ecoles list" do
+        ecole = Ecole.create! valid_attributes
+        allow(Ecole).to receive(:find).with(ecole.id.to_s) {ecole}
+        expect {
+          delete :destroy, {:id => ecole.to_param}
+        }.to change(Ecole, :count).by(-1)
+      end
+
+      it "redirects to the ecoles list" do
+        utilisateur_session = double('utilisateur')
+        allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+
+        ecole = Ecole.create! valid_attributes
+        allow(Ecole).to receive(:find).with(ecole.id.to_s) {ecole}
+        delete :destroy, {:id => ecole.to_param}
+        response.should redirect_to(ecoles_url)
+      end
+    end
+    it "invalid session" do
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+
       ecole = Ecole.create! valid_attributes
-      delete :destroy, {:id => ecole.to_param}, valid_session
-      response.should redirect_to(ecoles_url)
+      allow(Ecole).to receive(:find).with(ecole.id.to_s) {ecole}
+      delete :destroy, {:id => ecole.to_param}
+
+      response.should redirect_to(new_utilisateur_session_path)
     end
   end
-
 end

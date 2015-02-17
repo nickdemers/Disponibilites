@@ -4,6 +4,7 @@ require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
 require 'factory_girl'
 require 'simplecov'
+require 'devise'
 
 SimpleCov.start 'rails' do
    add_filter "factories/"
@@ -31,6 +32,7 @@ RSpec.configure do |config|
 
   # Rspec for Devise
   config.include Devise::TestHelpers, type: :controller
+  config.include Devise::TestHelpers, type: :helper
 
   config.include FactoryGirl::Syntax::Methods
 

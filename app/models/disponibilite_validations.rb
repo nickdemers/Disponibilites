@@ -12,7 +12,7 @@ module DisponibiliteValidations
   def disponible
     # do not run on disponibilite that don't matter anymore
     return unless utilisateur_remplacant_id && date_heure_debut && date_heure_fin
-    return if self.statut == "attribue" || date_heure_fin < DateTime.now
+    return if self.statut == "attribue" || date_heure_fin < Time.now
     if Disponibilite.where("utilisateur_remplacant_id = :utilisateur_remplacant_id and id != :disponibilite_id and (:date_heure_debut between date_heure_debut " +
                            "and date_heure_fin OR :date_heure_fin between date_heure_debut and date_heure_fin)",
                            {utilisateur_remplacant_id: utilisateur_remplacant_id, disponibilite_id: id, date_heure_debut: date_heure_debut,
@@ -25,7 +25,7 @@ module DisponibiliteValidations
   # Does not run on checked out, checked in, overdue, or missed Reservations
   def dates_non_passees
     return unless date_heure_debut && date_heure_fin
-    if date_heure_fin < DateTime.now || date_heure_debut < DateTime.now
+    if date_heure_fin < Time.now || date_heure_debut < Time.now
       errors.add(:base, "Les dates de début et de fin ne peuvent pas être dans le passé.\n")
     end
   end

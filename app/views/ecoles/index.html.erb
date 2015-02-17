@@ -32,4 +32,6 @@
 
 <br>
 
-<%= link_to 'New École', new_ecole_path %>
+<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_ecole_path,
+            :class => 'btn btn-primary' %>

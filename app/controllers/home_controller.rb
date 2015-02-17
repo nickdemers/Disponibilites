@@ -4,6 +4,5 @@ class HomeController < ApplicationController
 
   def index
     @disponibilites_avenir = get_disponibilites_avenir_non_attribue
-    @disponibilites = Disponibilite.all
   end
 end

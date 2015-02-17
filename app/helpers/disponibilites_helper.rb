@@ -52,11 +52,30 @@ module DisponibilitesHelper
   end
 
   def get_disponibilites_avenir_non_attribue(date_heure_debut = Date.current, date_heure_fin = Date.current + 2.months)
-    liste_disponibilites = Disponibilite.where("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin", {date_debut: date_heure_debut, date_fin: date_heure_fin})
+    if current_utilisateur.role? :admin then
+      liste_disponibilites = Disponibilite.where("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin", {date_debut: date_heure_debut, date_fin: date_heure_fin})
+    elsif current_utilisateur.role? :permanent then
+      liste_disponibilites = Disponibilite.where("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin and utilisateur_absent_id = :utilisateur_absent_id", {date_debut: date_heure_debut, date_fin: date_heure_fin, utilisateur_absent_id: current_utilisateur.id})
+    elsif current_utilisateur.role? :remplacant then
+      liste_disponibilites = Disponibilite.where("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin and utilisateur_remplacant_id = :utilisateur_remplacant_id", {date_debut: date_heure_debut, date_fin: date_heure_fin, utilisateur_remplacant_id: current_utilisateur.id})
+    end
     if !liste_disponibilites.nil? then
-        return liste_disponibilites.order("date_heure_debut").first(10)
+      return liste_disponibilites.order("date_heure_debut").first(10)
     else
       return liste_disponibilites
     end
+  end
+
+  def get_disponibilites(date_heure_debut = Date.current, date_heure_fin = Date.current + 2.months)
+    if current_utilisateur.role? :admin then
+      liste_disponibilites = Disponibilite.where("date_heure_debut between :date_debut and :date_fin", {date_debut: date_heure_debut, date_fin: date_heure_fin})
+    elsif current_utilisateur.role? :permanent then
+      liste_disponibilites = Disponibilite.where("date_heure_debut between :date_debut and :date_fin and utilisateur_absent_id = :utilisateur_absent_id", {date_debut: date_heure_debut, date_fin: date_heure_fin, utilisateur_absent_id: current_utilisateur.id})
+    elsif current_utilisateur.role? :remplacant then
+      liste_disponibilites = Disponibilite.where("date_heure_debut between :date_debut and :date_fin and utilisateur_remplacant_id = :utilisateur_remplacant_id", {date_debut: date_heure_debut, date_fin: date_heure_fin, utilisateur_remplacant_id: current_utilisateur.id})
+    end
+
+    return liste_disponibilites
+
   end
 end
