@@ -43,6 +43,14 @@ module DisponibilitesHelper
     end
   end
 
+  def get_utilisateur_permanent_nom_format
+    if @utilisateur_remplacant.nil? or @utilisateur_remplacant.nom.nil? or @utilisateur_remplacant.prenom.nil? then
+      return ""
+    else
+      return @utilisateur_remplacant.nom + ', ' + @utilisateur_remplacant.prenom
+    end
+  end
+
   def get_utilisateur_remplacant_nom_format
     if @utilisateur_remplacant.nil? or @utilisateur_remplacant.nom.nil? or @utilisateur_remplacant.prenom.nil? then
       return ""

@@ -121,15 +121,18 @@ describe DisponibilitesHelper do
   describe "get_disponibilites_avenir_non_attribue" do
     describe "disponibilites finded" do
       it "without params Date" do
+        utilisateur = FactoryGirl.create(:utilisateur_admin)
+        role = FactoryGirl.create(:role)
+        utilisateur.roles= [role]
 
-        #utilisateur_session = double('utilisateur')
-        #allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
-        role = Role.create({nom: 'admin'})
-        utilisateur = Utilisateur.create({prenom: 'Nicolas', nom: 'Demers', message_texte_permis: 'non', niveau: 3, email: 'test@test.ca',
-                                          numero_cellulaire: '418 999-8888', numero_telephone: '418 777-5555', titre: 'Permanent', password: '12345678', roles: [role]})
+        sign_in utilisateur
+
+        #role = Role.create({nom: 'admin'})
+        #utilisateur = Utilisateur.create({prenom: 'Nicolas', nom: 'Demers', message_texte_permis: 'non', niveau: 3, email: 'test@test.ca',
+        #                                  numero_cellulaire: '418 999-8888', numero_telephone: '418 777-5555', titre: 'Permanent', password: '12345678', roles: [role]})
         #before { allow(controller).to receive(:current_utilisateur) { utilisateur } }
         #allow(helper).to receive(:current_utilisateur) { utilisateur }
-        sign_in(utilisateur)
+        #sign_in(utilisateur)
 
         disponibilite = build(:disponibilite_disponible)
         Disponibilite.stub_chain(:where, :order, :first).and_return(disponibilite)

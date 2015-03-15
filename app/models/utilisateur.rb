@@ -19,8 +19,6 @@ class Utilisateur < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable, :lockable
   #strong_parameters :email, :message_texte_permis, :niveau, :nom, :numero_cellulaire, :numero_telephone, :prenom, :titre
 
-  #belongs_to :disponibilites_absent, :class_name => 'Disponibilite', :foreign_key => 'utilisateur_absent_id'
-  #belongs_to :disponibilites_remplacant, :class_name => 'Disponibilite', :foreign_key => 'utilisateur_remplacant_id'
   has_many :disponibilites_absent, :foreign_key => 'utilisateur_absent_id', :class_name => 'Disponibilite', :dependent => :restrict_with_exception
   has_many :disponibilites_remplacant, :foreign_key => 'utilisateur_remplacant_id', :class_name => 'Disponibilite', :dependent => :restrict_with_exception
 

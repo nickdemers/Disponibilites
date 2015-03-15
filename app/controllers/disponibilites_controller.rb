@@ -1,6 +1,6 @@
 class DisponibilitesController < ApplicationController
   before_action :authenticate_utilisateur!
-  before_action :set_disponibilite, only: [:show, :edit, :update, :destroy]
+  before_action :set_disponibilite, only: [:show, :edit, :update, :destroy, :accepter_disponibilite]
   before_action :set_disponibilites_avenir, only: [:index, :show, :new, :edit]
 
   # GET /disponibilites
@@ -35,7 +35,7 @@ class DisponibilitesController < ApplicationController
 
   # GET /disponibilites/1/edit
   def edit
-    @utilisateur_absent = Utilisateur.where("titre = 'permanent'")
+    @utilisateur_absent = Utilisateur.where(:titre => 'permanent')
 
     if !@disponibilite.utilisateur_remplacant.nil?
       @utilisateur_remplacant = Utilisateur.find @disponibilite.utilisateur_remplacant
@@ -46,9 +46,7 @@ class DisponibilitesController < ApplicationController
   def create
     @disponibilite = Disponibilite.new(disponibilite_params)
 
-    @utilisateur_absent = Utilisateur.where("titre = 'permanent'")
-
-    @utilisateur_remplacant = Utilisateur.order("id").joins(:disponibilites_remplacant).find(["titre = 'remplacant' and ((? < disponibilites.date_heure_debut) or (? > disponibilites.date_heure_fin))", @disponibilite.date_heure_fin, @disponibilite.date_heure_debut]).first
+    @utilisateur_remplacant = Utilisateur.order("id").joins(:disponibilites_remplacant).where(["titre = 'remplacant' and ((? < disponibilites.date_heure_debut) or (? > disponibilites.date_heure_fin))", @disponibilite.date_heure_fin, @disponibilite.date_heure_debut]).first
 
     if !@utilisateur_remplacant.nil?
       @disponibilite.utilisateur_remplacant= @utilisateur_remplacant
@@ -57,9 +55,16 @@ class DisponibilitesController < ApplicationController
 
     respond_to do |format|
       if @disponibilite.save
+
+        if !@utilisateur_remplacant.nil?
+          DisponibiliteMailer.nouvelle_disponibilite_email(@disponibilite.utilisateur_remplacant, @disponibilite).deliver_later
+        end
+
         format.html { redirect_to @disponibilite, notice: t("disponibilite.messages.save_creation_succes") }
         format.json { render action: 'show', status: :created, location: @disponibilite }
       else
+        @utilisateur_absent = Utilisateur.where(:titre => 'permanent')
+
         set_disponibilites_avenir
 
         format.html { render action: 'new' }
@@ -77,7 +82,7 @@ class DisponibilitesController < ApplicationController
       else
         set_disponibilites_avenir
 
-        @utilisateur_absent = Utilisateur.where("titre = 'permanent'")
+        @utilisateur_absent = Utilisateur.where(:titre => 'permanent')
         format.html { render action: 'edit' }
         format.json { render json: @disponibilite.errors, status: :unprocessable_entity }
       end
@@ -95,7 +100,6 @@ class DisponibilitesController < ApplicationController
 
   def for_calendar
     liste_disponibilites = get_disponibilites(Time.at(params[:start].to_i).to_date,Time.at(params[:end].to_i).to_date)
-    #Disponibilite.where("date_heure_debut between :date_debut and :date_fin", {date_debut: Time.at(params[:start].to_i).to_date, date_fin: Time.at(params[:end].to_i).to_date})
     if !liste_disponibilites.nil? then
       @events = liste_disponibilites.map do |d|
         { :id => d.id,
@@ -103,12 +107,30 @@ class DisponibilitesController < ApplicationController
           :className => d.statut.eql?("attribue") ? "event-green" : d.statut.eql?("attente") ? "event-orange" : "event-red",
           :start => d.date_heure_debut.strftime("%Y/%m/%d"),
           :end => d.date_heure_fin.strftime("%Y/%m/%d"),
-          :url => disponibilite_path(d)}
+          :url => disponibilite_path(d),
+          :nom_utilisateur_absent => d.utilisateur_absent.prenom}
       end
     end
 
     render json: @events
 
+  end
+
+  def accepter_disponibilite
+    @disponibilite.statut= "attribue"
+
+    respond_to do |format|
+      if @disponibilite.save
+        format.html { redirect_to @disponibilite, notice: t("disponibilite.messages.save_modification_succes") }
+        format.json { head :no_content }
+      else
+        set_disponibilites_avenir
+
+        @utilisateur_absent = Utilisateur.where(:titre => 'permanent')
+        format.html { redirect_to @disponibilite }
+        format.json { render json: @disponibilite.errors, status: :unprocessable_entity }
+      end
+    end
   end
 
   private

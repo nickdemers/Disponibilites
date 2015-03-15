@@ -5,9 +5,11 @@ describe HomeController do
   describe "valid session" do
     describe "Menu avec des disponibilités" do
       it "utilisateur connecté, afficher le contenu" do
+        utilisateur = FactoryGirl.create(:utilisateur_admin)
+        role = FactoryGirl.create(:role)
+        utilisateur.roles= [role]
 
-        disponibilite_dispo = FactoryGirl.create(:disponibilite_disponible)
-        Disponibilite.stub_chain(:where).and_return(disponibilite_dispo)
+        sign_in utilisateur
 
         disponibilite = create(:disponibilite_disponible)
 
@@ -21,6 +23,11 @@ describe HomeController do
     end
     describe "Menu sans disponibilité" do
       it "utilisateur connecté, afficher le contenu" do
+        utilisateur = FactoryGirl.create(:utilisateur_admin)
+        role = FactoryGirl.create(:role)
+        utilisateur.roles= [role]
+
+        sign_in utilisateur
 
         allow(Disponibilite).to receive(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) {nil}
 

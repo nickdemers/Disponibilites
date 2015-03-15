@@ -33,8 +33,11 @@ describe RolesController do
   describe "GET index" do
     describe "valid session" do
       it "assigns all roles as @roles" do
-        utilisateur_session = double('utilisateur')
-        allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+        utilisateur = FactoryGirl.create(:utilisateur_admin)
+        role = FactoryGirl.create(:role)
+        utilisateur.roles= [role]
+
+        sign_in utilisateur
 
         role = create(:role)
 
@@ -58,8 +61,11 @@ describe RolesController do
   describe "GET show" do
     describe "valid session" do
       it "assigns the requested role as @role" do
-        utilisateur_session = double('utilisateur')
-        allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+        utilisateur = FactoryGirl.create(:utilisateur_admin)
+        role = FactoryGirl.create(:role)
+        utilisateur.roles= [role]
+
+        sign_in utilisateur
 
         role = create(:role)
 
@@ -82,8 +88,11 @@ describe RolesController do
   describe "GET new" do
     describe "valid session" do
       it "assigns a new role as @role" do
-        utilisateur_session = double('utilisateur')
-        allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+        utilisateur = FactoryGirl.create(:utilisateur_admin)
+        role = FactoryGirl.create(:role)
+        utilisateur.roles= [role]
+
+        sign_in utilisateur
 
         get :new, {}
         assigns(:role).should be_a_new(Role)
@@ -101,10 +110,11 @@ describe RolesController do
   describe "GET edit" do
     describe "valid session" do
       it "assigns the requested role as @role" do
-        utilisateur_session = double('utilisateur')
-        allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+        utilisateur = FactoryGirl.create(:utilisateur_admin)
+        role = FactoryGirl.create(:role)
+        utilisateur.roles= [role]
 
-        role = create(:role)
+        sign_in utilisateur
 
         allow(Role).to receive(:find).with(role.id.to_s) {role}
 
@@ -128,8 +138,11 @@ describe RolesController do
   describe "POST create" do
     describe "valid session" do
       before(:each) do
-        utilisateur_session = double('utilisateur')
-        allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+        utilisateur = FactoryGirl.create(:utilisateur_admin)
+        role = FactoryGirl.create(:role)
+        utilisateur.roles= [role]
+
+        sign_in utilisateur
       end
 
       describe "with valid params" do
@@ -186,8 +199,11 @@ describe RolesController do
   describe "PUT update" do
     describe "valid session" do
       before(:each) do
-        utilisateur_session = double('utilisateur')
-        allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+        utilisateur = FactoryGirl.create(:utilisateur_admin)
+        role = FactoryGirl.create(:role)
+        utilisateur.roles= [role]
+
+        sign_in utilisateur
       end
 
       describe "with valid params" do
@@ -259,8 +275,11 @@ describe RolesController do
   describe "DELETE destroy" do
     describe "valid session" do
       before(:each) do
-        utilisateur_session = double('utilisateur')
-        allow(request.env['warden']).to receive(:authenticate!) { utilisateur_session }
+        utilisateur = FactoryGirl.create(:utilisateur_admin)
+        role = FactoryGirl.create(:role)
+        utilisateur.roles= [role]
+
+        sign_in utilisateur
       end
 
       it "redirects to the roles list" do

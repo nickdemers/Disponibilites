@@ -1,6 +1,7 @@
 class UtilisateursController < ApplicationController
-  before_action :authenticate_utilisateur!
-  before_action :set_utilisateur, only: [:show, :edit, :update, :destroy]
+  #before_action :authenticate_utilisateur!
+  #before_action :set_utilisateur, only: [:show, :edit, :update, :destroy]
+  load_and_authorize_resource
   before_action :set_disponibilites_avenir, only: [:index, :show, :new, :edit]
 
   # GET /utilisateurs
@@ -26,7 +27,7 @@ class UtilisateursController < ApplicationController
   # GET /utilisateurs/new
   # GET /utilisateurs/new.json
   def new
-    @utilisateur = Utilisateur.new
+    #@utilisateur = Utilisateur.new
 
     respond_to do |format|
       format.html # new.html.erb
@@ -41,7 +42,7 @@ class UtilisateursController < ApplicationController
   # POST /utilisateurs
   # POST /utilisateurs.json
   def create
-    @utilisateur = Utilisateur.new(utilisateur_params)
+    #@utilisateur = Utilisateur.new(utilisateur_params)
     respond_to do |format|
       if params[:utilisateur][:password].blank?
         params[:utilisateur].delete(:password)
@@ -93,9 +94,9 @@ class UtilisateursController < ApplicationController
   end
 
   private
-    def set_utilisateur
-      @utilisateur = Utilisateur.find(params[:id])
-    end
+    #def set_utilisateur
+    #  @utilisateur = Utilisateur.find(params[:id])
+    #end
 
     def set_disponibilites_avenir
       @disponibilites_avenir = get_disponibilites_avenir_non_attribue

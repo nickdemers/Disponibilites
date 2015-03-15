@@ -136,20 +136,19 @@
                         return cal.fullCalendar('unselect');
                     }
                 });
-            },
-            eventClick: function(calEvent, jsEvent, view) {
+            }, */
+            /*eventClick: function(calEvent, jsEvent, view) {
                 return bootbox.dialog({
-                    message: $("<form class='form'><label>Change event name</label></form><input id='new-event-title' class='form-control' type='text' value='" + calEvent.title + "' /> "),
+                    message: $("<form class='form'><label>Disponibilité</label></form><input id='new-event-title' class='form-control' type='text' value='" + calEvent.nom_utilisateur_absent + "' /><br />"),
                     buttons: {
-                        "delete": {
-                            label: "<i class='icon-trash'></i> Delete Event",
-                            className: "pull-left",
-                            callback: function() {
-                                return cal.fullCalendar("removeEvents", function(ev) {
-                                    return ev._id === calEvent._id;
-                                });
-                            }
-                        },
+                      "acceder": {
+                        label: "<i class='icon-trash'></i> Modifier",
+                        className: "pull-left",
+                        callback: function() {
+                          calEvent.url = 'disponibilites/' + calEvent.id;
+                          return cal.fullCalendar( 'renderEvent', calEvent );
+                        }
+                      },
                         success: {
                             label: "<i class='icon-save'></i> Save",
                             className: "btn-success",
@@ -160,6 +159,30 @@
                         }
                     }
                 });
+            },*/
+            /*eventClick: function(calEvent, jsEvent, view) {
+              return bootbox.dialog({
+                message: $("<form class='form'><label>Change event name</label></form><input id='new-event-title' class='form-control' type='text' value='" + calEvent.title + "' /> "),
+                buttons: {
+                  "delete": {
+                    label: "<i class='icon-trash'></i> Delete Event",
+                    className: "pull-left",
+                    callback: function() {
+                      return cal.fullCalendar("removeEvents", function(ev) {
+                        return ev._id === calEvent._id;
+                      });
+                    }
+                  },
+                  success: {
+                    label: "<i class='icon-save'></i> Save",
+                    className: "btn-success",
+                    callback: function() {
+                      calEvent.title = $("#new-event-title").val();
+                      return cal.fullCalendar('updateEvent', calEvent);
+                    }
+                  }
+                }
+              });
             },
             drop: function(date, allDay) {
                 var copiedEventObject, eventClass, originalEventObject;
@@ -180,31 +203,6 @@
             },*/
             eventSources : [
                 {url: '/disponibilites/for_calendar'}
-
-            //events: [
-                <% #if !@disponibilites.nil? then
-                   #compteurDisponibilite = 0
-                   #@disponibilites.each do |d| %>
-                //{
-                /*    id: < #d.id %>,
-                    title: "< #d.date_heure_debut.strftime("%H:%M") + " - " + d.date_heure_fin.strftime("%H:%M") %>",
-                    <%  #if d.statut.eql?("attribue") then %>
-                    className: 'event-green',
-                    <%  #elsif d.statut.eql?("attente") then %>
-                    className: 'event-orange',
-                    <%  #elsif d.statut.eql?("disponible") then %>
-                    className: 'event-red',
-                    <%  #end %>
-                    start: new Date("< #d.date_heure_debut.strftime("%Y/%m/%d") %>"),
-                    end: new Date("< #d.date_heure_fin.strftime("%Y/%m/%d") %>")
-                    //url: "<%# disponibilite_path(d) %>"
-                    <% #compteurDisponibilite += 1 %>
-                }
-                <%    #if compteurDisponibilite != @disponibilites.size %>
-                ,  */
-                <%    #end %>
-                <% # end
-                   #end %>
             ]
         });
 

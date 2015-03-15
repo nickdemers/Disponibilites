@@ -4,26 +4,17 @@ Disponibilites::Application.routes.draw do
 
   #devise_for :utilisateurs, :controllers => { sessions: "utilisateurs/sessions", registrations: "utilisateurs/registrations" }
   devise_for :utilisateurs, :controllers => { sessions: "utilisateurs/sessions", passwords: "utilisateurs/passwords" }
-  #devise_for :utilisateurs
-  #devise_scope :utilisateurs do
-  #  get '/login' => 'utilisateurs/sessions#new'
-  #  get '/logout' => 'utilisateurs/sessions#destroy'
-  #end
-  #resources :utilisateurs, :controller => "utilisateur"
-
-  #devise_scope :utilisateurs do
-  #  get '/reset_password' => "utilisateurs/passwords#new", :as => :reset_password
-  #end
 
   resources :roles
 
-  resources :niveaus
+  #resources :niveaus
 
   resources :endroits
 
   resources :disponibilites do
     collection do
       get "for_calendar"
+      get "accepter_disponibilite/:id" => 'disponibilites#accepter_disponibilite', :as => :accepter
     end
   end
 
@@ -34,9 +25,11 @@ Disponibilites::Application.routes.draw do
 
   get "home/index"
 
-  #root to: 'home#index'
   root 'home#index'
 
+  #put '/accepter_disponibilite/:id' => 'disponibilites#accepter_disponibilite', :as => :accepter_disponibilite
+
+  #put '/add_to_cart/:id' => 'catalog#add_to_cart', :as => :add_to_cart
   #get "/auth/:provider/callback" => "sessions#create"
 
   # You can have the root of your site routed with "root"

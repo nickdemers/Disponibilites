@@ -34,7 +34,7 @@ gem 'devise'
 gem 'devise_invitable'
 gem 'devise-i18n'
 gem 'rolify'
-gem 'cancan'
+gem 'cancancan', '~> 1.10'
 # Encryption du mot de passe
 gem 'bcrypt-ruby'
 gem 'bcrypt', '~> 3.1.7'

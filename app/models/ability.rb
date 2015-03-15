@@ -2,11 +2,19 @@ class Ability
   include CanCan::Ability
 
   def initialize(user)
+    if user.role? :super_admin
+      can :manage, :all
+    else
+      can :read, :all
+    end
+  end
+
+  #def initialize(user)
     #TODO remettre
     user ||= Utilisateur.new # guest user
 
     #if user.role? :super_admin
-      can :manage, :all
+  #    can :manage, :all
 =begin
     elsif user.role? :commission_scolaire_admin
       can :manage, [Disponibilite, Utilisateur]
@@ -56,5 +64,5 @@ class Ability
     #
     # See the wiki for details:
     # https://github.com/ryanb/cancan/wiki/Defining-Abilities
-  end
+ # end
 end

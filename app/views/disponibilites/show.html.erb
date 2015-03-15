@@ -24,6 +24,9 @@
   <dd><%= get_description_statut(@disponibilite.statut) %></dd>
 </dl>
 
+<% if current_utilisateur.role? :remplacant and current_utilisateur.id == @disponibilite.utilisateur_remplacant_id %>
+  <%= link_to "Accepter", accepter_disponibilites_path(@disponibilite), :class => 'btn btn-default' %>
+<% else %>
 <%= link_to t('.back', :default => t("helpers.links.back")),
               disponibilites_path, :class => 'btn btn-default'  %>
 <%= link_to t('.edit', :default => t("helpers.links.edit")),
@@ -33,3 +36,4 @@
               :method => 'delete',
               :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Êtes-vous certain ?')) },
               :class => 'btn btn-danger' %>
+<% end %>
