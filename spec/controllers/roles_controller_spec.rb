@@ -33,27 +33,28 @@ describe RolesController do
   describe "GET index" do
     describe "valid session" do
       it "assigns all roles as @roles" do
-        utilisateur = FactoryGirl.create(:utilisateur_admin)
+        user = FactoryGirl.create(:user_admin)
         role = FactoryGirl.create(:role)
-        utilisateur.roles= [role]
+        user.roles= [role]
 
-        sign_in utilisateur
+        sign_in user
 
         role = create(:role)
 
         allow(Role).to receive(:all) {[role]}
+        #expect(Role).to receive(:all).and_return([role])
 
         get :index, {}
-        assigns(:roles).should eq([role])
+        expect(assigns(:roles)).to eq([role])
       end
     end
     describe "invalid session" do
       it "not connected" do
-        allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+        allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
 
         get :index, {}
 
-        response.should redirect_to(new_utilisateur_session_path)
+        expect(response).to redirect_to(new_user_session_path)
       end
     end
   end
@@ -61,69 +62,69 @@ describe RolesController do
   describe "GET show" do
     describe "valid session" do
       it "assigns the requested role as @role" do
-        utilisateur = FactoryGirl.create(:utilisateur_admin)
+        user = FactoryGirl.create(:user_admin)
         role = FactoryGirl.create(:role)
-        utilisateur.roles= [role]
+        user.roles= [role]
 
-        sign_in utilisateur
+        sign_in user
 
         role = create(:role)
 
         allow(Role).to receive(:find).with(role.id.to_s) {role}
 
         get :show, {:id => role.to_param}
-        assigns(:role).should eq(role)
+        expect(assigns(:role)).to eq(role)
       end
     end
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
 
       role = create(:role)
       get :show, {:id => role.to_param}
 
-      response.should redirect_to(new_utilisateur_session_path)
+      expect(response).to redirect_to(new_user_session_path)
     end
   end
 
   describe "GET new" do
     describe "valid session" do
       it "assigns a new role as @role" do
-        utilisateur = FactoryGirl.create(:utilisateur_admin)
+        user = FactoryGirl.create(:user_admin)
         role = FactoryGirl.create(:role)
-        utilisateur.roles= [role]
+        user.roles= [role]
 
-        sign_in utilisateur
+        sign_in user
 
         get :new, {}
-        assigns(:role).should be_a_new(Role)
+        expect(assigns(:role)).to be_a_new(Role)
       end
     end
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
 
       get :new, {}
 
-      response.should redirect_to(new_utilisateur_session_path)
+      expect(response).to redirect_to(new_user_session_path)
     end
   end
 
   describe "GET edit" do
     describe "valid session" do
       it "assigns the requested role as @role" do
-        utilisateur = FactoryGirl.create(:utilisateur_admin)
+        user = FactoryGirl.create(:user_admin)
         role = FactoryGirl.create(:role)
-        utilisateur.roles= [role]
+        user.roles= [role]
 
-        sign_in utilisateur
+        sign_in user
 
         allow(Role).to receive(:find).with(role.id.to_s) {role}
 
         get :edit, {:id => role.to_param}
-        assigns(:role).should eq(role)
+        expect(assigns(:role)).to eq(role)
       end
     end
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
 
       role = create(:role)
 
@@ -131,18 +132,18 @@ describe RolesController do
 
       get :edit, {:id => role.to_param}
 
-      response.should redirect_to(new_utilisateur_session_path)
+      expect(response).to redirect_to(new_user_session_path)
     end
   end
 
   describe "POST create" do
     describe "valid session" do
       before(:each) do
-        utilisateur = FactoryGirl.create(:utilisateur_admin)
+        user = FactoryGirl.create(:user_admin)
         role = FactoryGirl.create(:role)
-        utilisateur.roles= [role]
+        user.roles= [role]
 
-        sign_in utilisateur
+        sign_in user
       end
 
       describe "with valid params" do
@@ -152,8 +153,8 @@ describe RolesController do
           allow(role).to receive(:save) {true}
 
           post :create, {:role => valid_attributes}
-          assigns(:role).should be_a(Role)
-          assigns(:role).should be_persisted
+          expect(assigns(:role)).to be_a(Role)
+          expect(assigns(:role)).to be_persisted
         end
 
         it "redirects to the created role" do
@@ -162,7 +163,7 @@ describe RolesController do
           allow(role).to receive(:save) {true}
 
           post :create, {:role => valid_attributes}
-          response.should redirect_to(role)
+          expect(response).to redirect_to(role)
         end
       end
 
@@ -173,8 +174,8 @@ describe RolesController do
           allow(role).to receive(:save) {false}
 
           post :create, {:role => valid_attributes}
-          assigns(:role).should be_a(Role)
-          assigns(:role).should be_persisted
+          expect(assigns(:role)).to be_a(Role)
+          expect(assigns(:role)).to be_persisted
         end
 
         it "re-renders the 'new' template" do
@@ -183,27 +184,27 @@ describe RolesController do
           allow(role).to receive(:save) {false}
 
           post :create, {:role => valid_attributes}
-          response.should render_template("new")
+          expect(response).to render_template("new")
         end
       end
     end
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
 
       post :create, {:role => valid_attributes}
 
-      response.should redirect_to(new_utilisateur_session_path)
+      expect(response).to redirect_to(new_user_session_path)
     end
   end
 
   describe "PUT update" do
     describe "valid session" do
       before(:each) do
-        utilisateur = FactoryGirl.create(:utilisateur_admin)
+        user = FactoryGirl.create(:user_admin)
         role = FactoryGirl.create(:role)
-        utilisateur.roles= [role]
+        user.roles= [role]
 
-        sign_in utilisateur
+        sign_in user
       end
 
       describe "with valid params" do
@@ -215,7 +216,7 @@ describe RolesController do
           # specifies that the Role created on the previous line
           # receives the :update_attributes message with whatever params are
           # submitted in the request.
-          Role.any_instance.should_receive(:update).with({ "nom" => "" })
+          expect_any_instance_of(Role).to receive(:update).with({ "nom" => "" })
           put :update, {:id => role.to_param, :role => { "nom" => "" }}
         end
 
@@ -224,7 +225,7 @@ describe RolesController do
           allow(Role).to receive(:find).with(role.id.to_s) {role}
 
           put :update, {:id => role.to_param, :role => valid_attributes}
-          assigns(:role).should eq(role)
+          expect(assigns(:role)).to eq(role)
         end
 
         it "redirects to the role" do
@@ -232,7 +233,7 @@ describe RolesController do
           allow(Role).to receive(:find).with(role.id.to_s) {role}
 
           put :update, {:id => role.to_param, :role => valid_attributes}
-          response.should redirect_to(role)
+          expect(response).to redirect_to(role)
         end
       end
 
@@ -242,11 +243,10 @@ describe RolesController do
           allow(Role).to receive(:find).with(role.id.to_s) {role}
 
           # Trigger the behavior that occurs when invalid params are submitted
-          #Role.any_instance.stub(:save).and_return(false)
           allow(Role).to receive(:save) {false}
 
           put :update, {:id => role.to_param, :role => valid_attributes}
-          assigns(:role).should eq(role)
+          expect(assigns(:role)).to eq(role)
         end
 
         it "re-renders the 'edit' template" do
@@ -254,32 +254,31 @@ describe RolesController do
           allow(Role).to receive(:find).with(role.id.to_s) {role}
 
           # Trigger the behavior that occurs when invalid params are submitted
-          #allow(Role).to receive(:save) {false}
           Role.any_instance.stub(:save).and_return(false)
 
           put :update, {:id => role.to_param, :role => valid_attributes}
-          response.should render_template("edit")
+          expect(response).to render_template("edit")
         end
       end
     end
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
 
       role = Role.create! valid_attributes
       put :update, {:id => role.to_param, :role => valid_attributes}
 
-      response.should redirect_to(new_utilisateur_session_path)
+      expect(response).to redirect_to(new_user_session_path)
     end
   end
 
   describe "DELETE destroy" do
     describe "valid session" do
       before(:each) do
-        utilisateur = FactoryGirl.create(:utilisateur_admin)
+        user = FactoryGirl.create(:user_admin)
         role = FactoryGirl.create(:role)
-        utilisateur.roles= [role]
+        user.roles= [role]
 
-        sign_in utilisateur
+        sign_in user
       end
 
       it "redirects to the roles list" do
@@ -288,17 +287,17 @@ describe RolesController do
         allow(Role).to receive(:find).with(role.id.to_s) {role}
 
         delete :destroy, {:id => role.to_param}
-        response.should redirect_to(roles_url)
+        expect(response).to redirect_to(roles_url)
       end
     end
 
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
 
       role = create(:role)
       delete :destroy, {:id => role.to_param}
 
-      response.should redirect_to(new_utilisateur_session_path)
+      expect(response).to redirect_to(new_user_session_path)
     end
   end
 end

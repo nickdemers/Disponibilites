@@ -3,8 +3,8 @@ require 'spec_helper'
 describe "disponibilites_bck/new" do
   before(:each) do
     assign(:disponibilite, stub_model(Disponibilite,
-      :utilisateur_absent_id => 1,
-      :utilisateur_remplacant_id => 1,
+      :user_absent_id => 1,
+      :user_remplacant_id => 1,
       :endroit_id => 1,
       :niveau_id => 1,
       :surveillance => false,
@@ -19,8 +19,8 @@ describe "disponibilites_bck/new" do
 
     # Run the generator again with the --webrat flag if you want to use webrat matchers
     assert_select "form[action=?][method=?]", disponibilites_path, "post" do
-      assert_select "input#disponibilite_utilisateur_absent_id[name=?]", "disponibilite[utilisateur_absent_id]"
-      assert_select "input#disponibilite_utilisateur_remplacant_id[name=?]", "disponibilite[utilisateur_remplacant_id]"
+      assert_select "input#disponibilite_user_absent_id[name=?]", "disponibilite[user_absent_id]"
+      assert_select "input#disponibilite_user_remplacant_id[name=?]", "disponibilite[user_remplacant_id]"
       assert_select "input#disponibilite_endroit_id[name=?]", "disponibilite[endroit_id]"
       assert_select "input#disponibilite_niveau_id[name=?]", "disponibilite[niveau_id]"
       assert_select "input#disponibilite_surveillance[name=?]", "disponibilite[surveillance]"

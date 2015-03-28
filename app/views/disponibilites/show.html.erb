@@ -2,10 +2,10 @@
 <h1>Disponibilité</h1>
 
 <dl class="dl-horizontal">
-  <dt><strong><%= model_class.human_attribute_name(:utilisateur_absent_id) %>:</strong></dt>
-  <dd><%= @disponibilite.utilisateur_absent_id %></dd>
-  <dt><strong><%= model_class.human_attribute_name(:utilisateur_remplacant_id) %>:</strong></dt>
-  <dd><%= get_utilisateur_remplacant_nom_format %></dd>
+  <dt><strong>Utilisateur absent :</strong></dt>
+  <dd><%= get_user_absent_nom_format(@disponibilite) %></dd>
+  <dt><strong>Utilisateur remplaçant :</strong></dt>
+  <dd><%= get_user_remplacant_nom_format(@disponibilite) %></dd>
   <dt><strong>École:</strong></dt>
   <dd><%= @disponibilite.ecole.nom %></dd>
   <dt><strong><%= model_class.human_attribute_name(:niveau_id) %>:</strong></dt>
@@ -24,9 +24,10 @@
   <dd><%= get_description_statut(@disponibilite.statut) %></dd>
 </dl>
 
-<% if current_utilisateur.role? :remplacant and current_utilisateur.id == @disponibilite.utilisateur_remplacant_id %>
-  <%= link_to "Accepter", accepter_disponibilites_path(@disponibilite), :class => 'btn btn-default' %>
-<% else %>
+<% if can? :accepter_disponibilite, @disponibilite and @disponibilite.user_remplacant_id == current_user.id and @disponibilite.statut == "waiting" %>
+  <%= link_to "Accepter", accept_disponibilites_path(@disponibilite), :class => 'btn btn-default' %>
+  <%= link_to "Refuser", deny_disponibilites_path(@disponibilite), :class => 'btn btn-danger' %>
+<% elsif can? :manage, @disponibilite %>
 <%= link_to t('.back', :default => t("helpers.links.back")),
               disponibilites_path, :class => 'btn btn-default'  %>
 <%= link_to t('.edit', :default => t("helpers.links.edit")),

@@ -3,8 +3,8 @@ require 'spec_helper'
 describe "disponibilites_bck/show" do
   before(:each) do
     @disponibilite = assign(:disponibilite, stub_model(Disponibilite,
-      :utilisateur_absent_id => 1,
-      :utilisateur_remplacant_id => 2,
+      :user_absent_id => 1,
+      :user_remplacant_id => 2,
       :endroit_id => 3,
       :niveau_id => 4,
       :surveillance => false,

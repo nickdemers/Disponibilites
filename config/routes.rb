@@ -2,8 +2,8 @@ Disponibilites::Application.routes.draw do
 
   resources :ecoles
 
-  #devise_for :utilisateurs, :controllers => { sessions: "utilisateurs/sessions", registrations: "utilisateurs/registrations" }
-  devise_for :utilisateurs, :controllers => { sessions: "utilisateurs/sessions", passwords: "utilisateurs/passwords" }
+  #devise_for :users, :controllers => { sessions: "users/sessions", registrations: "users/registrations" }
+  devise_for :user, :controllers => { sessions: "users/sessions", passwords: "users/passwords" }
 
   resources :roles
 
@@ -14,11 +14,12 @@ Disponibilites::Application.routes.draw do
   resources :disponibilites do
     collection do
       get "for_calendar"
-      get "accepter_disponibilite/:id" => 'disponibilites#accepter_disponibilite', :as => :accepter
+      get "accept_availability/:id" => 'disponibilites#accept_availability', :as => :accept
+      get "deny_availability/:id" => 'disponibilites#deny_availability', :as => :deny
     end
   end
 
-  resources :utilisateurs
+  resources :users
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

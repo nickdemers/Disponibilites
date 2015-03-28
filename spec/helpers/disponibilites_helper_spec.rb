@@ -31,7 +31,7 @@ describe DisponibilitesHelper do
 
   describe "get description statut" do
     it "with id and contain key" do
-      description = get_description_statut('disponible')
+      description = get_description_statut('available')
       description.should eq("Disponible")
     end
     it "without id" do
@@ -100,39 +100,32 @@ describe DisponibilitesHelper do
     end
   end
 
-  describe "get utilisateur_remplacant formatted" do
+  describe "get user_remplacant formatted" do
     it "with name and first name" do
-      @utilisateur_remplacant = build(:utilisateur_remplacant)
-      utilisateur_nom = get_utilisateur_remplacant_nom_format
-      utilisateur_nom.should eq("Demers remplacant, Nicolas")
+      @user_remplacant = build(:user_remplacant)
+      user_nom = get_user_remplacant_nom_format
+      user_nom.should eq("Demers remplacant, Nicolas")
     end
     it "without name and first name" do
-      @utilisateur_remplacant = build(:utilisateur_remplacant_without_names)
-      utilisateur_nom = get_utilisateur_remplacant_nom_format
-      utilisateur_nom.should eq("")
+      @user_remplacant = build(:user_remplacant_without_names)
+      user_nom = get_user_remplacant_nom_format
+      user_nom.should eq("")
     end
-    it "without utilisateur remplacant" do
-      @utilisateur_remplacant = nil
-      utilisateur_nom = get_utilisateur_remplacant_nom_format
-      utilisateur_nom.should eq("")
+    it "without user remplacant" do
+      @user_remplacant = nil
+      user_nom = get_user_remplacant_nom_format
+      user_nom.should eq("")
     end
   end
 
   describe "get_disponibilites_avenir_non_attribue" do
     describe "disponibilites finded" do
       it "without params Date" do
-        utilisateur = FactoryGirl.create(:utilisateur_admin)
+        user = FactoryGirl.create(:user_admin)
         role = FactoryGirl.create(:role)
-        utilisateur.roles= [role]
+        user.roles= [role]
 
-        sign_in utilisateur
-
-        #role = Role.create({nom: 'admin'})
-        #utilisateur = Utilisateur.create({prenom: 'Nicolas', nom: 'Demers', message_texte_permis: 'non', niveau: 3, email: 'test@test.ca',
-        #                                  numero_cellulaire: '418 999-8888', numero_telephone: '418 777-5555', titre: 'Permanent', password: '12345678', roles: [role]})
-        #before { allow(controller).to receive(:current_utilisateur) { utilisateur } }
-        #allow(helper).to receive(:current_utilisateur) { utilisateur }
-        #sign_in(utilisateur)
+        sign_in user
 
         disponibilite = build(:disponibilite_disponible)
         Disponibilite.stub_chain(:where, :order, :first).and_return(disponibilite)
@@ -147,13 +140,20 @@ describe DisponibilitesHelper do
       end
     end
     describe "disponibilites not finded" do
+      before(:each) do
+        user = FactoryGirl.create(:user_admin)
+        role = FactoryGirl.create(:role)
+        user.roles= [role]
+
+        sign_in user
+      end
       it "without params Date" do
-        allow(Disponibilite).to receive(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) {nil}
+        allow(Disponibilite).to receive(:where).with("(statut = 'waiting' or statut = 'available') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) {nil}
         liste_disponibilites = get_disponibilites_avenir_non_attribue
         liste_disponibilites.should be_nil
       end
       it "with params Date" do
-        allow(Disponibilite).to receive(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) {nil}
+        allow(Disponibilite).to receive(:where).with("(statut = 'waiting' or statut = 'available') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) {nil}
         liste_disponibilites = get_disponibilites_avenir_non_attribue(Date.current + 1.days, Date.current + 2.days)
         liste_disponibilites.should be_nil
       end

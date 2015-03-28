@@ -7,10 +7,6 @@ gem 'mysql2'
 
 gem 'sass-rails'#, '5.0.1'#'~> 4.0.0'
 
-#gem 'omniauth' #, '1.1.0'
-#gem 'omniauth-google-oauth2', :require => 'omniauth/google_oauth2' #, :git => 'https://github.com/zquestz/omniauth-google-oauth2.git'
-#gem 'google-api-client', :require => 'google/api_client'
-
 # Gems used only for assets and not required
 # in production environments by default.
 gem 'coffee-rails'#, '4.1.0'#'~> 4.0.0'

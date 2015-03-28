@@ -1,0 +1,33 @@
+<%- model_class = User -%>
+<div class="page-header">
+  <h1>Utilisateur</h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:nom) %> :</strong></dt>
+  <dd><%= @user.nom %></dd>
+  <dt><strong>Prénom :</strong></dt>
+  <dd><%= @user.prenom %></dd>
+  <dt><strong>Courriel :</strong></dt>
+  <dd><%= @user.email %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:titre) %> :</strong></dt>
+  <dd><%= get_description_poste(@user.titre) %></dd>
+  <dt><strong>Numéro téléphone :</strong></dt>
+  <dd><%= @user.numero_telephone %></dd>
+  <dt><strong>Numéro cellulaire :</strong></dt>
+  <dd><%= @user.numero_cellulaire %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:message_texte_permis) %> :</strong></dt>
+  <dd><%= @user.message_texte_permis %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:niveau) %> :</strong></dt>
+  <dd><%= get_description_niveau(@user.niveau) %></dd>
+</dl>
+
+<%= link_to t('.back', :default => t("helpers.links.back")),
+              users_path, :class => 'btn btn-default'  %>
+<%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_user_path(@user), :class => 'btn btn-default' %>
+<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              user_path(@user),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm"), :default => 'Êtes-vous certain ?') },
+              :class => 'btn btn-danger' %>

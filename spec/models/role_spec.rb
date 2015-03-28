@@ -8,9 +8,10 @@ describe Role do
     end
 
     it "avec succès avec utilisateur" do
-      utilisateur = Utilisateur.create({prenom: 'Nicolas', nom: 'Demers', message_texte_permis: 'non', niveau: 3, email: 'test@test.ca',
+      user = User.create({prenom: 'Nicolas', nom: 'Demers', message_texte_permis: 'non', niveau: 3, email: 'test@test.ca',
                                         numero_cellulaire: '418 999-8888', numero_telephone: '418 777-5555', titre: 'Permanent', password: '12345678'})
-      role = Role.create({nom: 'admin', utilisateurs: [utilisateur]})
+      role = Role.create({nom: 'admin'})
+      role.users= [user]
       role.should be_valid
     end
 
@@ -53,16 +54,18 @@ describe Role do
 
     it "en erreur, le rôle est assigné à un utilisateur" do
       role = Role.create({nom: 'admin'})
-      Utilisateur.create({prenom: 'Nicolas', nom: 'Demers', email: 'nickdemers@gmail.com', numero_telephone: '418 777-5555',
+      User.create({prenom: 'Nicolas', nom: 'Demers', email: 'nickdemers@gmail.com', numero_telephone: '418 777-5555',
                           niveau: 3, titre: 'Permanent', password: '12345678', roles: [role]})
       role.destroy
       role.errors.messages.should == {:base => ["Le rôle ne peut pas être supprimé car il est assigné à un utilisateur.\n"]}
     end
 
     it "en erreur, le rôle a un utilisateur d'assigné" do
-      user = Utilisateur.create({prenom: 'Nicolas', nom: 'Demers', email: 'nickdemers@gmail.com', numero_telephone: '418 777-5555',
+      user = User.create({prenom: 'Nicolas', nom: 'Demers', email: 'nickdemers@gmail.com', numero_telephone: '418 777-5555',
                                  niveau: 3, titre: 'Permanent', password: '12345678'})
-      role = Role.create({nom: 'admin', utilisateurs: [user]})
+      role = Role.create({nom: 'admin'})
+      role.users= [user]
+
       role.destroy
       role.errors.messages.should == {:base => ["Le rôle ne peut pas être supprimé car il est assigné à un utilisateur.\n"]}
     end

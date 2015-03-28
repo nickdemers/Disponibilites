@@ -48,7 +48,7 @@
           <div class="container-fluid nav-collapse">
             <ul class="nav">
               <li><%= link_to "Ajouter une disponibilitée", "/disponibilites#create"  %></li>
-              <li><%= link_to "Ajouter un utilisateur", "/utilisateurs#create"  %></li>
+              <li><%= link_to "Ajouter un utilisateur", "/users#create"  %></li>
               <!--<li> link_to "Sign in with Google", "/auth/google_oauth2" </li>-->
             </ul>
           </div><!--/.nav-collapse -->
@@ -64,7 +64,7 @@
               <li class="nav-header">Sidebar</li>
               <% if !@disponibilites_avenir.nil? then
                    @disponibilites_avenir.each do |d| %>
-                     <li><%= d.utilisateur_absent.nom %>, <%= d.utilisateur_absent.prenom %></li>
+                     <li><%= d.user_absent.nom %>, <%= d.user_absent.prenom %></li>
               <%   end
                  end %>
               <% #if !@events_calendar.nil? then

@@ -144,7 +144,7 @@ fr:
       save_creation_succes: La disponibilité a été créée avec succès.
       save_modification_succes: La disponibilité a été modifiée avec succès.
     erreurs:
-      aucun_utilisateur_absent_disponible: 'Aucun utilisateur absent disponible.'
+      aucun_user_absent_disponible: 'Aucun utilisateur absent disponible.'
       save_disponibilite: 'la sauvegarde de cette disponibilité :'
   role:
     messages:
@@ -152,12 +152,12 @@ fr:
       save_modification_succes: Le rôle a été modifié avec succès.
     erreurs:
       save_role: 'la sauvegarde de ce rôle :'
-  utilisateur:
+  user:
       messages:
         save_creation_succes: L'utilisateur a été créé avec succès.
         save_modification_succes: L'utilisateur a été modifié avec succès.
       erreurs:
-        save_utilisateur: 'la sauvegarde de cet utilisateur :'
+        save_user: 'la sauvegarde de cet utilisateur :'
   ecole:
       messages:
         save_creation_succes: L'école a été créé avec succès.

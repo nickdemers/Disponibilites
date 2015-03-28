@@ -1,6 +1,7 @@
 class EcolesController < ApplicationController
-  before_action :authenticate_utilisateur!
-  before_action :set_ecole, only: [:show, :edit, :update, :destroy]
+  before_action :authenticate_user!
+  load_and_authorize_resource
+  #before_action :set_ecole, only: [:show, :edit, :update, :destroy]
 
   def index
     @ecoles = Ecole.all
@@ -19,7 +20,7 @@ class EcolesController < ApplicationController
   end
 
   def new
-    @ecole = Ecole.new
+    #@ecole = Ecole.new
     respond_to do |format|
       format.html # new.html.erb
       format.json { render json: @ecole }
@@ -30,7 +31,7 @@ class EcolesController < ApplicationController
   end
 
   def create
-    @ecole = Ecole.new(ecole_params)
+    #@ecole = Ecole.new(ecole_params)
     respond_to do |format|
       if @ecole.save
         format.html { redirect_to @ecole, notice: t("ecole.messages.save_creation_succes") }
@@ -63,9 +64,9 @@ class EcolesController < ApplicationController
   end
 
   private
-    def set_ecole
-      @ecole = Ecole.find(params[:id])
-    end
+    #def set_ecole
+    #  @ecole = Ecole.find(params[:id])
+    #end
 
     def ecole_params
       params.require(:ecole).permit(:nom, :adresse, :numero_telephone)

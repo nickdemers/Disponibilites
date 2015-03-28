@@ -4,8 +4,8 @@ describe "disponibilites_bck/index" do
   before(:each) do
     assign(:disponibilites_bck, [
       stub_model(Disponibilite,
-        :utilisateur_absent_id => 1,
-        :utilisateur_remplacant_id => 2,
+        :user_absent_id => 1,
+        :user_remplacant_id => 2,
         :endroit_id => 3,
         :niveau_id => 4,
         :surveillance => false,
@@ -14,8 +14,8 @@ describe "disponibilites_bck/index" do
         :statut => "Statut"
       ),
       stub_model(Disponibilite,
-        :utilisateur_absent_id => 1,
-        :utilisateur_remplacant_id => 2,
+        :user_absent_id => 1,
+        :user_remplacant_id => 2,
         :endroit_id => 3,
         :niveau_id => 4,
         :surveillance => false,

@@ -11,58 +11,58 @@ describe Disponibilite do
     end
 
     it "en erreur, doit contenir l'identifiant de l'utilisateur absent" do
-      Disponibilite.create({ecole_id: @ecole.id, niveau_id: 33, date_heure_debut: DateTime.now + 1.hour, date_heure_fin: DateTime.now + 1.hour, statut: 'test'}).errors.messages.should == {:utilisateur_absent_id => ["doit être rempli(e)"]}
+      Disponibilite.create({ecole_id: @ecole.id, niveau_id: 33, date_heure_debut: DateTime.now + 1.hour, date_heure_fin: DateTime.now + 1.hour, statut: 'test'}).errors.messages.should == {:user_absent_id => ["doit être rempli(e)"]}
     end
 
     it "en erreur, doit contenir l'identifiant de l'école" do
-      Disponibilite.create({utilisateur_absent_id: 11, niveau_id: 33, date_heure_debut: DateTime.now + 1.hour, date_heure_fin: DateTime.now + 1.hour, statut: 'test'}).errors.messages.should == {:ecole_id => ["doit être rempli(e)"]}
+      Disponibilite.create({user_absent_id: 11, niveau_id: 33, date_heure_debut: DateTime.now + 1.hour, date_heure_fin: DateTime.now + 1.hour, statut: 'test'}).errors.messages.should == {:ecole_id => ["doit être rempli(e)"]}
     end
 
     it "en erreur, doit contenir l'identifiant du niveau" do
-      Disponibilite.create({utilisateur_absent_id: 11, ecole_id: @ecole.id, date_heure_debut: DateTime.now + 1.hour, date_heure_fin: DateTime.now + 1.hour, statut: 'test'}).errors.messages.should == {:niveau_id => ["doit être rempli(e)"]}
+      Disponibilite.create({user_absent_id: 11, ecole_id: @ecole.id, date_heure_debut: DateTime.now + 1.hour, date_heure_fin: DateTime.now + 1.hour, statut: 'test'}).errors.messages.should == {:niveau_id => ["doit être rempli(e)"]}
     end
 
     it "en erreur, doit contenir la date heure du début" do
-      Disponibilite.create({utilisateur_absent_id: 11, ecole_id: @ecole.id, niveau_id: 33, date_heure_fin: DateTime.now + 1.hour, statut: 'test'}).errors.messages.should == {:date_heure_debut => ["doit être rempli(e)"]}
+      Disponibilite.create({user_absent_id: 11, ecole_id: @ecole.id, niveau_id: 33, date_heure_fin: DateTime.now + 1.hour, statut: 'test'}).errors.messages.should == {:date_heure_debut => ["doit être rempli(e)"]}
     end
 
     it "en erreur, doit contenir la date heure de fin" do
-      Disponibilite.create({utilisateur_absent_id: 11, ecole_id: @ecole.id, niveau_id: 33, date_heure_debut: DateTime.now + 1.hour, statut: 'test'}).errors.messages.should == {:date_heure_fin => ["doit être rempli(e)"]}
+      Disponibilite.create({user_absent_id: 11, ecole_id: @ecole.id, niveau_id: 33, date_heure_debut: DateTime.now + 1.hour, statut: 'test'}).errors.messages.should == {:date_heure_fin => ["doit être rempli(e)"]}
     end
 
     it "en erreur, doit contenir le statut" do
-      Disponibilite.create({utilisateur_absent_id: 11, ecole_id: @ecole.id, niveau_id: 33, date_heure_debut: DateTime.now + 1.hour, date_heure_fin: DateTime.now + 1.hour}).errors.messages.should == {:statut => ["doit être rempli(e)"]}
+      Disponibilite.create({user_absent_id: 11, ecole_id: @ecole.id, niveau_id: 33, date_heure_debut: DateTime.now + 1.hour, date_heure_fin: DateTime.now + 1.hour}).errors.messages.should == {:statut => ["doit être rempli(e)"]}
     end
 
     #it "en erreur, l'identifiant de l'utilisateur absent doit être numérique" do
-    #  Disponibilite.create({utilisateur_absent_id: 'absent', ecole_id: 22, niveau_id: 33, date_heure_debut: DateTime.now + 1.hour, date_heure_fin: DateTime.now + 1.hour, statut: 'test'}).errors.messages.should == {:utilisateur_absent_id => ["n'est pas un nombre"]}
+    #  Disponibilite.create({user_absent_id: 'absent', ecole_id: 22, niveau_id: 33, date_heure_debut: DateTime.now + 1.hour, date_heure_fin: DateTime.now + 1.hour, statut: 'test'}).errors.messages.should == {:user_absent_id => ["n'est pas un nombre"]}
     #end
 
     #it "en erreur, l'identifiant de l'utilisateur remplacant doit être numérique" do
-    #  Disponibilite.create({utilisateur_absent_id: 11, utilisateur_remplacant_id: 'remplacant', ecole_id: 22, niveau_id: 33, date_heure_debut: DateTime.now + 1.hour, date_heure_fin: DateTime.now + 1.hour, statut: 'test'}).errors.messages.should == {:utilisateur_remplacant_id => ["n'est pas un nombre"]}
+    #  Disponibilite.create({user_absent_id: 11, user_remplacant_id: 'remplacant', ecole_id: 22, niveau_id: 33, date_heure_debut: DateTime.now + 1.hour, date_heure_fin: DateTime.now + 1.hour, statut: 'test'}).errors.messages.should == {:user_remplacant_id => ["n'est pas un nombre"]}
     #end
 
     it "en erreur, l'identifiant de l'école doit être numérique" do
-      Disponibilite.create({utilisateur_absent_id: 11, ecole_id: 'ecole', niveau_id: 33, date_heure_debut: DateTime.now + 1.hour, date_heure_fin: DateTime.now + 1.hour, statut: 'test'}).errors.messages.should == {:ecole_id => ["n'est pas un nombre"]}
+      Disponibilite.create({user_absent_id: 11, ecole_id: 'ecole', niveau_id: 33, date_heure_debut: DateTime.now + 1.hour, date_heure_fin: DateTime.now + 1.hour, statut: 'test'}).errors.messages.should == {:ecole_id => ["n'est pas un nombre"]}
     end
 
     it "en erreur, l'identifiant du niveau doit être numérique" do
-      Disponibilite.create({utilisateur_absent_id: 11, ecole_id: @ecole.id, niveau_id: 'niveau', date_heure_debut: DateTime.now + 1.hour, date_heure_fin: DateTime.now + 1.hour, statut: 'test'}).errors.messages.should == {:niveau_id => ["n'est pas un nombre"]}
+      Disponibilite.create({user_absent_id: 11, ecole_id: @ecole.id, niveau_id: 'niveau', date_heure_debut: DateTime.now + 1.hour, date_heure_fin: DateTime.now + 1.hour, statut: 'test'}).errors.messages.should == {:niveau_id => ["n'est pas un nombre"]}
     end
 
     describe "validation de date heure debut et date heure fin" do
       it "en erreur, la date heure debut ne peut être dans le passé" do
-        Disponibilite.create({utilisateur_absent_id: 11, ecole_id: @ecole.id, niveau_id: 33, date_heure_debut: DateTime.now - 1.day, date_heure_fin: DateTime.now + 1.hour, statut: 'test'}).errors.messages.should == {:base => ["Les dates de début et de fin ne peuvent pas être dans le passé.\n"]}
+        Disponibilite.create({user_absent_id: 11, ecole_id: @ecole.id, niveau_id: 33, date_heure_debut: DateTime.now - 1.day, date_heure_fin: DateTime.now + 1.hour, statut: 'test'}).errors.messages.should == {:base => ["Les dates de début et de fin ne peuvent pas être dans le passé.\n"]}
       end
 
       it "en erreur, la date heure debut doit être avant la date heure fin" do
-        Disponibilite.create({utilisateur_absent_id: 11, ecole_id: @ecole.id, niveau_id: 33, date_heure_debut: DateTime.now + 2.hour, date_heure_fin: DateTime.now + 1.hour, statut: 'test'}).errors.messages.should == {:base => ["La date heure de début de la disponibilité doit être avant la date heure de fin.\n"]}
+        Disponibilite.create({user_absent_id: 11, ecole_id: @ecole.id, niveau_id: 33, date_heure_debut: DateTime.now + 2.hour, date_heure_fin: DateTime.now + 1.hour, statut: 'test'}).errors.messages.should == {:base => ["La date heure de début de la disponibilité doit être avant la date heure de fin.\n"]}
       end
     end
 
     it "en erreur, l'utilisateur remplaçant est déjà en remplacement" do
-      expect(Disponibilite.create({utilisateur_absent_id: 11, utilisateur_remplacant_id: 44, ecole_id: @ecole.id, niveau_id: 33, date_heure_debut: Time.now + 1.hour, date_heure_fin: Time.now + 2.hour, statut: 'attribue'})).to be_valid
-      dispo = Disponibilite.create({utilisateur_absent_id: 22, utilisateur_remplacant_id: 44, ecole_id: @ecole.id, niveau_id: 33, date_heure_debut: Time.now + 1.hour, date_heure_fin: Time.now + 2.hour, statut: 'disponible'})
+      expect(Disponibilite.create({user_absent_id: 11, user_remplacant_id: 44, ecole_id: @ecole.id, niveau_id: 33, date_heure_debut: Time.now + 1.hour, date_heure_fin: Time.now + 2.hour, statut: 'assigned'})).to be_valid
+      dispo = Disponibilite.create({user_absent_id: 22, user_remplacant_id: 44, ecole_id: @ecole.id, niveau_id: 33, date_heure_debut: Time.now + 1.hour, date_heure_fin: Time.now + 2.hour, statut: 'available'})
       dispo.should be_invalid
       expect(dispo.errors.messages).to eq({:base => ["L'utilisateur remplaçant a déjà un remplacement dans ces heures.\n"]})
     end
@@ -73,17 +73,17 @@ describe Disponibilite do
       @disponibilite = FactoryGirl.create(:disponibilite_disponible)
     end
     it "avec succès" do
-      @utilisateur_absent = FactoryGirl.create(:utilisateur_permanent2)
-      @utilisateur_remplacant = FactoryGirl.create(:utilisateur_remplacant)
+      @user_absent = FactoryGirl.create(:user_permanent2)
+      @user_remplacant = FactoryGirl.create(:user_remplacant)
       ecole = FactoryGirl.create(:ecole)
 
       @disponibilite.ecole_id = ecole.id
       @disponibilite.niveau_id = 14
       @disponibilite.date_heure_debut = DateTime.now + 2.minute
       @disponibilite.date_heure_fin = DateTime.now + 4.minute
-      @disponibilite.statut = 'attribue'
-      @disponibilite.utilisateur_absent = @utilisateur_absent
-      @disponibilite.utilisateur_remplacant = @utilisateur_remplacant
+      @disponibilite.statut = 'assigned'
+      @disponibilite.user_absent = @user_absent
+      @disponibilite.user_remplacant = @user_remplacant
       @disponibilite.surveillance = 'O'
       @disponibilite.specialite = 'O'
       @disponibilite.notes = 'note test'
@@ -91,9 +91,9 @@ describe Disponibilite do
     end
 
     it "en erreur, doit contenir l'identifiant de l'utilisateur absent" do
-      @disponibilite.utilisateur_absent = nil
+      @disponibilite.user_absent = nil
       @disponibilite.should be_invalid
-      @disponibilite.errors.messages.should == {:utilisateur_absent_id=>["doit être rempli(e)"]}
+      @disponibilite.errors.messages.should == {:user_absent_id=>["doit être rempli(e)"]}
     end
 
     it "en erreur, doit contenir l'identifiant de l'école" do
@@ -127,9 +127,9 @@ describe Disponibilite do
     end
 
     #it "en erreur, l'identifiant de l'utilisateur remplacant doit être numérique" do
-    #  @disponibilite.utilisateur_remplacant = 'remplacant'
+    #  @disponibilite.user_remplacant = 'remplacant'
     #  @disponibilite.should be_invalid
-    #  @disponibilite.errors.messages.should == {:utilisateur_remplacant=>["n'est pas un nombre"]}
+    #  @disponibilite.errors.messages.should == {:user_remplacant=>["n'est pas un nombre"]}
     #end
 
     it "en erreur, l'identifiant de l'école doit être numérique" do
@@ -162,7 +162,7 @@ describe Disponibilite do
 
     it "en erreur, l'utilisateur remplaçant est déjà en remplacement" do
       disponibilite1 = FactoryGirl.create(:disponibilite_attribue)
-      @disponibilite.utilisateur_remplacant_id = 2
+      @disponibilite.user_remplacant_id = 2
       @disponibilite.should be_invalid
       @disponibilite.errors.messages.should == {:base=>["L'utilisateur remplaçant a déjà un remplacement dans ces heures.\n"]}
     end

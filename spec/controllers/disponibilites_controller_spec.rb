@@ -23,33 +23,54 @@ describe DisponibilitesController do
   # This should return the minimal set of attributes required to create a valid
   # Disponibilite. As you add validations to Disponibilite, be sure to
   # adjust the attributes here as well.
-  let(:valid_attributes) { { "endroit_id" => "11", "niveau_id" => "12", "date_heure_debut" => DateTime.now + 1.minute, "date_heure_fin" => DateTime.now + 1.hour, "statut" => "attente", "utilisateur_absent_id" => "11", "utilisateur_remplacant_id" => "12"} }
+  let(:valid_attributes) { { "endroit_id" => "11", "niveau_id" => "12", "date_heure_debut" => DateTime.now + 1.minute, "date_heure_fin" => DateTime.now + 1.hour, "statut" => "waiting", "user_absent_id" => "11", "user_remplacant_id" => "12"} }
 
   describe "GET index" do
     describe "valid session" do
-      it "assigns all disponibilites as @disponibilites" do
-        utilisateur = FactoryGirl.create(:utilisateur_admin)
-        role = FactoryGirl.create(:role)
-        utilisateur.roles= [role]
+      before(:each) do
+        @user = FactoryGirl.create(:user_admin)
+      end
+      it "admin user" do
+        role = FactoryGirl.create(:role_admin)
+        @user.roles= [role]
 
-        sign_in utilisateur
+        sign_in @user
 
-        disponibilite = create(:disponibilite_disponible)
+        #disponibilite = FactoryGirl.create(:disponibilite_disponible)
 
-        allow(Disponibilite).to receive(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}){nil}
-        allow(Disponibilite).to receive(:all) {[disponibilite]}
+        #allow(Disponibilite).to receive(:where).with({:user_absent_id=>1})
+        #allow(Disponibilite).to receive(:where).with({})
+        #allow(Disponibilite).to receive(:where).with("(statut = 'waiting' or statut = 'available') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}){nil}
+        #allow(Disponibilite).to receive(:all) {[disponibilite]}
 
         get :index, {}
-        assigns(:disponibilites).should eq([disponibilite])
+        is_expected.to render_template(:index)
+        #assigns(:disponibilites).should eq([disponibilite])
+      end
+      it "permanent user" do
+        role = FactoryGirl.create(:role_permanent)
+        @user.roles= [role]
+
+        sign_in @user
+
+        get :index, {}
+        is_expected.to render_template(:index)
+      end
+      it "remplacant user" do
+        role = FactoryGirl.create(:role_remplacant)
+        @user.roles= [role]
+
+        sign_in @user
+
+        get :index, {}
+        is_expected.to render_template(:index)
       end
     end
 
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
-
+      allow(request.env['warden']).to receive(:authorize!).and_throw(:warden, {:scope => :user})
       get :index, {}
-
-      response.should redirect_to(new_utilisateur_session_path)
+      is_expected.to redirect_to(new_user_session_path)
     end
   end
 
@@ -57,157 +78,182 @@ describe DisponibilitesController do
     describe "valid session" do
       describe "assigns the requested disponibilite as @disponibilite" do
         before(:each) do
-          utilisateur = FactoryGirl.create(:utilisateur_admin)
+          user = FactoryGirl.create(:user_admin)
           role = FactoryGirl.create(:role)
-          utilisateur.roles= [role]
+          user.roles= [role]
 
-          sign_in utilisateur
+          sign_in user
 
-          allow(Disponibilite).to receive(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) {nil}
+          allow(Disponibilite).to receive(:where).with("(statut = 'waiting' or statut = 'available') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) {nil}
         end
 
-        it "with utilisateur_remplacant" do
+        it "with user_remplacant" do
           disponibilite = create(:disponibilite_attribue)
 
           allow(Disponibilite).to receive(:find).with(disponibilite.id.to_s) { disponibilite }
 
-          utilisateur_absent = create(:utilisateur_permanent2)
-          allow(Utilisateur).to receive(:find).with(disponibilite.utilisateur_absent) { utilisateur_absent }
+          user_absent = create(:user_permanent2)
+          allow(User).to receive(:find).with(disponibilite.user_absent) { user_absent }
 
-          utilisateur_remplacant = create(:utilisateur_remplacant2)
-          allow(Utilisateur).to receive(:find).with(disponibilite.utilisateur_remplacant) { utilisateur_remplacant }
+          user_remplacant = create(:user_remplacant2)
+          allow(User).to receive(:find).with(disponibilite.user_remplacant) { user_remplacant }
 
           get :show, {:id => disponibilite}
-          assigns(:disponibilite).should eq(disponibilite)
+          expect(assigns(:disponibilite)).to eq(disponibilite)
         end
-        it "without utilisateur_remplacant" do
+        it "without user_remplacant" do
           disponibilite = create(:disponibilite_disponible)
 
           allow(Disponibilite).to receive(:find).with(disponibilite.id.to_s) { disponibilite }
 
-          utilisateur_absent = create(:utilisateur_permanent2)
-          allow(Utilisateur).to receive(:find).with(disponibilite.utilisateur_absent) { utilisateur_absent }
+          user_absent = create(:user_permanent2)
+          allow(User).to receive(:find).with(disponibilite.user_absent) { user_absent }
 
           get :show, {:id => disponibilite}
-          assigns(:disponibilite).should eq(disponibilite)
+          expect(assigns(:disponibilite)).to eq(disponibilite)
         end
       end
     end
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
       disponibilite = create(:disponibilite_disponible)
 
       get :show, {:id => disponibilite}
 
-      response.should redirect_to(new_utilisateur_session_path)
+      is_expected.to redirect_to(new_user_session_path)
     end
   end
 
   describe "GET new" do
     describe "valid session" do
-      before(:each) do
-        @utilisateur = FactoryGirl.create(:utilisateur_admin)
-        role = FactoryGirl.create(:role)
-        @utilisateur.roles= [role]
+      describe "user with permitted roles" do
+        before(:each) do
+          @user = FactoryGirl.create(:user_admin)
+          role = FactoryGirl.create(:role)
+          @user.roles= [role]
 
-        sign_in @utilisateur
+          sign_in @user
 
-        allow(Disponibilite).to receive(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) { nil }
+          allow(Disponibilite).to receive(:where).with("(statut = 'waiting' or statut = 'available') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) { nil }
+        end
+
+        it "assigns a new disponibilite as @disponibilite" do
+          user_absent = create(:user_permanent2)
+          allow(User).to receive(:where).with({"id" => @user.id}) { [@user] }
+          allow(User).to receive(:where).with(:titre => "permanent") { user_absent }
+
+          get :new, {}
+          expect(assigns(:disponibilite)).to be_a_new(Disponibilite)
+        end
+
+        it "redirect to index, no user_absent available" do
+          allow(User).to receive(:where).with({"id" => @user.id}) { [@user] }
+          allow(User).to receive(:where).with(:titre => "permanent") { nil }
+
+          get :new, {}
+          is_expected.to redirect_to(disponibilites_url)
+        end
       end
+      it "user without roles" do
+        user = FactoryGirl.create(:user_admin)
+        role = FactoryGirl.create(:role_remplacant)
+        user.roles= [role]
 
-      it "assigns a new disponibilite as @disponibilite" do
-        utilisateur_absent = create(:utilisateur_permanent2)
-        allow(Utilisateur).to receive(:where).with({"id" => @utilisateur.id}) { [@utilisateur] }
-        allow(Utilisateur).to receive(:where).with(:titre => "permanent") { utilisateur_absent }
+        sign_in user
 
         get :new, {}
-        assigns(:disponibilite).should be_a_new(Disponibilite)
-      end
 
-      it "redirect to index, no utilisateur_absent available" do
-        allow(Utilisateur).to receive(:where).with({"id" => @utilisateur.id}) { [@utilisateur] }
-        allow(Utilisateur).to receive(:where).with(:titre => "permanent") { nil }
-
-        get :new, {}
-        response.should redirect_to(disponibilites_url)
+        is_expected.to redirect_to(root_url)
       end
     end
-
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
 
       get :new, {}
 
-      response.should redirect_to(new_utilisateur_session_path)
+      is_expected.to redirect_to(new_user_session_path)
     end
   end
 
   describe "GET edit" do
     describe "valid session" do
-      before(:each) do
-        utilisateur = FactoryGirl.create(:utilisateur_admin)
-        role = FactoryGirl.create(:role)
-        utilisateur.roles= [role]
+      describe "user with permitted roles" do
+        before(:each) do
+          user = FactoryGirl.create(:user_admin)
+          role = FactoryGirl.create(:role)
+          user.roles= [role]
 
-        sign_in utilisateur
+          sign_in user
 
-        allow(Disponibilite).to receive(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) { nil }
+          allow(Disponibilite).to receive(:where).with("(statut = 'waiting' or statut = 'available') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) { nil }
+        end
+
+        it "assigns the requested disponibilite as @disponibilite with user_remplacant" do
+          disponibilite = FactoryGirl.create(:disponibilite_attribue)
+
+          allow(Disponibilite).to receive(:find).with(disponibilite.id.to_s) { disponibilite }
+
+          user_remplacant = FactoryGirl.build(:user_remplacant)
+          user_permanent = build(:user_permanent)
+
+          allow(User).to receive(:find).with("titre = 'permanent'") { user_permanent }
+
+          allow(User).to receive(:find).with(disponibilite.user_remplacant) { user_remplacant }
+
+          get :edit, {:id => disponibilite.to_param}
+          expect(assigns(:disponibilite)).to eq(disponibilite)
+          expect(disponibilite.user_remplacant).to eq(user_remplacant)
+        end
+
+        it "assigns the requested disponibilite as @disponibilite without user_remplacant" do
+          disponibilite = create(:disponibilite_disponible)
+
+          allow(Disponibilite).to receive(:find).with(disponibilite.id.to_s) { disponibilite }
+
+          user_permanent = build(:user_permanent)
+
+          allow(User).to receive(:find).with("titre = 'permanent'") { user_permanent }
+
+          get :edit, {:id => disponibilite.to_param}
+          expect(assigns(:disponibilite)).to eq(disponibilite)
+          expect(disponibilite.user_remplacant).to be_nil
+        end
       end
-
-      it "assigns the requested disponibilite as @disponibilite with utilisateur_remplacant" do
+      it "user without permitted roles" do
         disponibilite = create(:disponibilite_attribue)
 
-        allow(Disponibilite).to receive(:find).with(disponibilite.id.to_s) { disponibilite }
+        user = FactoryGirl.create(:user_remplacant2)
+        role = FactoryGirl.create(:role_remplacant)
+        user.roles= [role]
 
-        utilisateur_remplacant = build(:utilisateur_remplacant)
-        utilisateur_permanent = build(:utilisateur_permanent)
-
-        allow(Utilisateur).to receive(:find).with("titre = 'permanent'") { utilisateur_permanent }
-
-        allow(Utilisateur).to receive(:find).with(disponibilite.utilisateur_remplacant) { utilisateur_remplacant }
+        sign_in user
 
         get :edit, {:id => disponibilite.to_param}
-        assigns(:disponibilite).should eq(disponibilite)
 
-        disponibilite.utilisateur_remplacant.should eq(utilisateur_remplacant)
-      end
-
-      it "assigns the requested disponibilite as @disponibilite without utilisateur_remplacant" do
-        disponibilite = create(:disponibilite_disponible)
-
-        allow(Disponibilite).to receive(:find).with(disponibilite.id.to_s) { disponibilite }
-
-        utilisateur_permanent = build(:utilisateur_permanent)
-
-        allow(Utilisateur).to receive(:find).with("titre = 'permanent'") { utilisateur_permanent }
-
-        get :edit, {:id => disponibilite.to_param}
-        assigns(:disponibilite).should eq(disponibilite)
-
-        disponibilite.utilisateur_remplacant.should be_nil
+        is_expected.to redirect_to(root_url)
       end
     end
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
       disponibilite = create(:disponibilite_disponible)
 
       get :edit, {:id => disponibilite.to_param}
 
-      response.should redirect_to(new_utilisateur_session_path)
+      is_expected.to redirect_to(new_user_session_path)
     end
   end
 
   describe "POST create" do
     describe "valid session" do
       before(:each) do
-        @utilisateur = FactoryGirl.create(:utilisateur_admin)
+        @user = FactoryGirl.create(:user_admin)
         role = FactoryGirl.create(:role)
-        @utilisateur.roles= [role]
+        @user.roles= [role]
 
-        sign_in @utilisateur
+        sign_in @user
       end
       describe "with valid params" do
-        describe "with utilisateur_remplacant" do
+        describe "with user_remplacant" do
 
 
           #it "creates a new Disponibilite" do
@@ -216,17 +262,17 @@ describe DisponibilitesController do
           #  Disponibilite.stub(:new).and_return(disponibilite)
 
           #  expect {
-          #    post :create, {disponibilite: {"endroit_id" => "11", "niveau_id" => "12", "date_heure_debut" => DateTime.now + 1.minute, "date_heure_fin" => DateTime.now + 1.hour, "statut" => disponibilite.statut, "utilisateur_absent_id" => @utilisateur_absent.id, "utilisateur_remplacant_id" => @utilisateur_remplacant.id}}, valid_session
+          #    post :create, {disponibilite: {"endroit_id" => "11", "niveau_id" => "12", "date_heure_debut" => DateTime.now + 1.minute, "date_heure_fin" => DateTime.now + 1.hour, "statut" => disponibilite.statut, "user_absent_id" => @user_absent.id, "user_remplacant_id" => @user_remplacant.id}}, valid_session
           #  }.to change(Disponibilite, :count).by(1)
           #end
 
           it "assigns a newly created disponibilite as @disponibilite" do
-            utilisateur_absent = create(:utilisateur_permanent2)
-            allow(Utilisateur).to receive(:where).with({"id" => @utilisateur.id}) { [@utilisateur] }
-            allow(Utilisateur).to receive(:where).with(:titre => "permanent") { utilisateur_absent }
+            user_absent = create(:user_permanent2)
+            allow(User).to receive(:where).with({"id" => @user.id}) { [@user] }
+            allow(User).to receive(:where).with(:titre => "permanent") { user_absent }
 
-            @utilisateur_remplacant = build_stubbed(:utilisateur_remplacant)
-            Utilisateur.stub_chain(:order, :joins, :where, :first).and_return(@utilisateur_remplacant)
+            @user_remplacant = build_stubbed(:user_remplacant)
+            User.stub_chain(:order, :joins, :where, :first).and_return(@user_remplacant)
 
             disponibilite = build(:disponibilite_attribue)
 
@@ -237,11 +283,11 @@ describe DisponibilitesController do
             DisponibiliteMailer.stub_chain(:nouvelle_disponibilite_email, :deliver_later)
 
             post :create, {:disponibilite => valid_attributes}
-            assigns(:disponibilite).should be_a(Disponibilite)
+            expect(assigns(:disponibilite)).to be_a(Disponibilite)
             #assigns(:disponibilite).should be_persisted
 
-            disponibilite.utilisateur_remplacant.should eq(@utilisateur_remplacant)
-            disponibilite.statut.should eq("attente")
+            expect(disponibilite.user_remplacant).to eq(@user_remplacant)
+            expect(disponibilite.statut).to eq("waiting")
           end
 
           #it "redirects to the created disponibilite" do
@@ -251,25 +297,25 @@ describe DisponibilitesController do
 
           #  disponibilite.stub(:save).and_return(true)
 
-          #  post :create, {disponibilite: {"endroit_id" => "11", "niveau_id" => "12", "date_heure_debut" => DateTime.now + 1.minute, "date_heure_fin" => DateTime.now + 1.hour, "statut" => "attente", "utilisateur_absent_id" => "11", "utilisateur_remplacant_id" => @utilisateur_remplacant.id}}, valid_session
+          #  post :create, {disponibilite: {"endroit_id" => "11", "niveau_id" => "12", "date_heure_debut" => DateTime.now + 1.minute, "date_heure_fin" => DateTime.now + 1.hour, "statut" => "waiting", "user_absent_id" => "11", "user_remplacant_id" => @user_remplacant.id}}, valid_session
           #  response.should redirect_to(Disponibilite.last)
           #end
         end
 
-        describe "without utilisateur_remplacant" do
+        describe "without user_remplacant" do
 
           #it "creates a new Disponibilite" do
           #  expect {
-          #    post :create, {disponibilite: {"endroit_id" => "11", "niveau_id" => "12", "date_heure_debut" => DateTime.now + 1.minute, "date_heure_fin" => DateTime.now + 1.hour, "statut" => "disponible", "utilisateur_absent_id" => @utilisateur_absent.id, "utilisateur_remplacant_id" => nil}}, valid_session
+          #    post :create, {disponibilite: {"endroit_id" => "11", "niveau_id" => "12", "date_heure_debut" => DateTime.now + 1.minute, "date_heure_fin" => DateTime.now + 1.hour, "statut" => "available", "user_absent_id" => @user_absent.id, "user_remplacant_id" => nil}}, valid_session
           #  }.to change(Disponibilite, :count).by(1)
           #end
 
           it "assigns a newly created disponibilite as @disponibilite" do
-            utilisateur_absent = create(:utilisateur_permanent2)
-            allow(Utilisateur).to receive(:where).with({"id" => @utilisateur.id}) { [@utilisateur] }
-            allow(Utilisateur).to receive(:where).with(:titre => "permanent") { utilisateur_absent }
+            user_absent = create(:user_permanent2)
+            allow(User).to receive(:where).with({"id" => @user.id}) { [@user] }
+            allow(User).to receive(:where).with(:titre => "permanent") { user_absent }
 
-            Utilisateur.stub_chain(:order, :joins, :where, :first).and_return(nil)
+            User.stub_chain(:order, :joins, :where, :first).and_return(nil)
 
             disponibilite = build(:disponibilite_disponible)
 
@@ -278,15 +324,16 @@ describe DisponibilitesController do
             allow(disponibilite).to receive(:save) { true }
 
             post :create, {:disponibilite => valid_attributes}
-            assigns(:disponibilite).should be_a(Disponibilite)
+            expect(assigns(:disponibilite)).to be_a(Disponibilite)
             #assigns(:disponibilite).should be_persisted
 
-            disponibilite.utilisateur_remplacant.should be_nil
-            disponibilite.statut.should eq("disponible")
+            expect(disponibilite.user_remplacant).to be_nil
+            expect(disponibilite.user_remplacant).to be_nil
+            expect(disponibilite.statut).to eq("available")
           end
 
           #it "redirects to the created disponibilite" do
-          #  post :create, {disponibilite: {"endroit_id" => "11", "niveau_id" => "12", "date_heure_debut" => DateTime.now + 1.minute, "date_heure_fin" => DateTime.now + 1.hour, "statut" => "disponible", "utilisateur_absent_id" => @utilisateur_absent.id, "utilisateur_remplacant_id" => nil}}, valid_session
+          #  post :create, {disponibilite: {"endroit_id" => "11", "niveau_id" => "12", "date_heure_debut" => DateTime.now + 1.minute, "date_heure_fin" => DateTime.now + 1.hour, "statut" => "available", "user_absent_id" => @user_absent.id, "user_remplacant_id" => nil}}, valid_session
           #  response.should redirect_to(Disponibilite.last)
           #end
         end
@@ -294,49 +341,50 @@ describe DisponibilitesController do
 
       describe "with invalid params" do
         before(:each) do
-          allow(Disponibilite).to receive(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) { nil }
+          allow(Disponibilite).to receive(:where).with("(statut = 'waiting' or statut = 'available') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) { nil }
 
-          utilisateur_absent = create(:utilisateur_permanent2)
-          allow(Utilisateur).to receive(:where).with({"id" => @utilisateur.id}) { [@utilisateur] }
-          allow(Utilisateur).to receive(:where).with(:titre => "permanent") { utilisateur_absent }
+          user_absent = create(:user_permanent2)
+          allow(User).to receive(:where).with({"id" => @user.id}) { [@user] }
+          allow(User).to receive(:where).with(:titre => "permanent") { user_absent }
 
-          @utilisateur_remplacant = build_stubbed(:utilisateur_remplacant)
-          Utilisateur.stub_chain(:order, :joins, :where, :first).and_return(@utilisateur_remplacant)
+          @user_remplacant = build_stubbed(:user_remplacant)
+          User.stub_chain(:order, :joins, :where, :first).and_return(@user_remplacant)
 
           allow(Disponibilite).to receive(:save) { false }
         end
 
         it "assigns a newly created but unsaved disponibilite as @disponibilite" do
           # Trigger the behavior that occurs when invalid params are submitted
-          post :create, {:disponibilite => { "utilisateur_absent_id" => "invalid value" }}
-          assigns(:disponibilite).should be_a_new(Disponibilite)
+          post :create, {:disponibilite => { "user_absent_id" => "invalid value" }}
+          expect(assigns(:disponibilite)).to be_a_new(Disponibilite)
         end
 
         it "re-renders the 'new' template" do
           # Trigger the behavior that occurs when invalid params are submitted
-          post :create, {:disponibilite => { "utilisateur_absent_id" => "invalid value" }}
-          response.should render_template("new")
+          post :create, {:disponibilite => { "user_absent_id" => "invalid value" }}
+          expect(response).to render_template("new")
+          expect(assigns(:disponibilite)).to be_a_new(Disponibilite)
         end
       end
     end
 
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
 
       post :create, {:disponibilite => valid_attributes}
 
-      response.should redirect_to(new_utilisateur_session_path)
+      expect(response).to redirect_to(new_user_session_path)
     end
   end
 
   describe "PUT update" do
     describe "valid session" do
       before(:each) do
-        @utilisateur = FactoryGirl.create(:utilisateur_admin)
+        @user = FactoryGirl.create(:user_admin)
         role = FactoryGirl.create(:role)
-        @utilisateur.roles= [role]
+        @user.roles= [role]
 
-        sign_in @utilisateur
+        sign_in @user
       end
 
       describe "with valid params" do
@@ -348,23 +396,23 @@ describe DisponibilitesController do
         end
 
         it "updates the requested disponibilite" do
-          put :update, {:id => @disponibilite.to_param, :disponibilite => { "utilisateur_absent_id" => "1" }}
+          put :update, {:id => @disponibilite.to_param, :disponibilite => { "user_absent_id" => "1" }}
         end
 
         it "assigns the requested disponibilite as @disponibilite" do
           put :update, {:id => @disponibilite.to_param, :disponibilite => valid_attributes}
-          assigns(:disponibilite).should eq(@disponibilite)
+          expect(assigns(:disponibilite)).to eq(@disponibilite)
         end
 
         it "redirects to the disponibilite" do
           put :update, {:id => @disponibilite.to_param, :disponibilite => valid_attributes}
-          response.should redirect_to(@disponibilite)
+          expect(response).to redirect_to(@disponibilite)
         end
       end
 
       describe "with invalid params" do
         before(:each) do
-          allow(Disponibilite).to receive(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) { nil }
+          allow(Disponibilite).to receive(:where).with("(statut = 'waiting' or statut = 'available') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) { nil }
 
           @disponibilite = create(:disponibilite_disponible)
 
@@ -372,36 +420,36 @@ describe DisponibilitesController do
 
           Disponibilite.any_instance.stub(:save).and_return(false)
 
-          utilisateur_absent = create(:utilisateur_permanent2)
-          allow(Utilisateur).to receive(:where).with({"id" => @utilisateur.id}) { [@utilisateur] }
-          allow(Utilisateur).to receive(:where).with(:titre => "permanent") { utilisateur_absent }
+          user_absent = create(:user_permanent2)
+          allow(User).to receive(:where).with({"id" => @user.id}) { [@user] }
+          allow(User).to receive(:where).with(:titre => "permanent") { user_absent }
         end
 
         it "assigns the disponibilite as @disponibilite" do
           # Trigger the behavior that occurs when invalid params are submitted
-          put :update, {:id => @disponibilite.to_param, :disponibilite => { "utilisateur_absent_id" => "invalid value" }}
-          assigns(:disponibilite).should eq(@disponibilite)
+          put :update, {:id => @disponibilite.to_param, :disponibilite => { "user_absent_id" => "invalid value" }}
+          expect(assigns(:disponibilite)).to eq(@disponibilite)
         end
       end
     end
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
       @disponibilite = create(:disponibilite_disponible)
 
-      put :update, {:id => @disponibilite.to_param, :disponibilite => { "utilisateur_absent_id" => "1" }}
+      put :update, {:id => @disponibilite.to_param, :disponibilite => { "user_absent_id" => "1" }}
 
-      response.should redirect_to(new_utilisateur_session_path)
+      expect(response).to redirect_to(new_user_session_path)
     end
   end
 
   describe "DELETE destroy" do
     describe "valid session" do
       before(:each) do
-        utilisateur = FactoryGirl.create(:utilisateur_admin)
+        user = FactoryGirl.create(:user_admin)
         role = FactoryGirl.create(:role)
-        utilisateur.roles= [role]
+        user.roles= [role]
 
-        sign_in utilisateur
+        sign_in user
       end
 
       it "redirects to the disponibilites list" do
@@ -411,28 +459,28 @@ describe DisponibilitesController do
         allow(disponibilite).to receive(:destroy)
 
         delete :destroy, {:id => disponibilite.to_param}
-        response.should redirect_to(disponibilites_url)
+        expect(response).to redirect_to(disponibilites_url)
       end
     end
 
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
       disponibilite = create(:disponibilite_disponible)
 
       delete :destroy, {:id => disponibilite.to_param}
 
-      response.should redirect_to(new_utilisateur_session_path)
+      expect(response).to redirect_to(new_user_session_path)
     end
   end
 
   describe "GET for_calendar" do
     describe "valid session" do
       before(:each) do
-        utilisateur = FactoryGirl.create(:utilisateur_admin)
+        user = FactoryGirl.create(:user_admin)
         role = FactoryGirl.create(:role)
-        utilisateur.roles= [role]
+        user.roles= [role]
 
-        sign_in utilisateur
+        sign_in user
       end
 
       it "assigns disponibilites as @events" do
@@ -441,72 +489,125 @@ describe DisponibilitesController do
         allow(Disponibilite).to receive(:where) { disponibilite }
 
         get :for_calendar, {start: 1417323600, end: 1420952400}, format: 'json'
-        assigns(:events).should eq([{:id=>disponibilite[0].id, :title=>disponibilite[0].date_heure_debut.strftime("%H:%M") + " - " + disponibilite[0].date_heure_fin.strftime("%H:%M"), :className=>"event-red", :start=>disponibilite[0].date_heure_debut.strftime("%Y/%m/%d"), :end=>disponibilite[0].date_heure_fin.strftime("%Y/%m/%d"), :url=>disponibilite_path(disponibilite[0]), :nom_utilisateur_absent=>"Nicolas"}])
+        expect(assigns(:events)).to eq([{:id=>disponibilite[0].id, :title=>disponibilite[0].date_heure_debut.strftime("%H:%M") + " - " + disponibilite[0].date_heure_fin.strftime("%H:%M"), :className=>"event-red", :start=>disponibilite[0].date_heure_debut.strftime("%Y/%m/%d"), :end=>disponibilite[0].date_heure_fin.strftime("%Y/%m/%d"), :url=>disponibilite_path(disponibilite[0]), :nom_user_absent=>"Nicolas"}])
       end
 
       it "assigns disponibilites without @events" do
         allow(Disponibilite).to receive(:where) { [] }
 
         get :for_calendar, {start: 1417323600, end: 1420952400}, format: 'json'
-        assigns(:events).should eq([])
+        expect(assigns(:events)).to eq([])
       end
     end
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
 
       get :for_calendar, {start: 1417323600, end: 1420952400}, format: 'json'
 
-      response.should redirect_to(new_utilisateur_session_path)
+      expect(response).to redirect_to(new_user_session_path)
     end
   end
 
-  describe "GET accepter_disponibilite" do
+  describe "GET accept_availability" do
     describe "valid session" do
       before(:each) do
-        @utilisateur = FactoryGirl.create(:utilisateur_remplacant)
+        @user = FactoryGirl.create(:user_remplacant)
         role = FactoryGirl.create(:role_remplacant)
-        @utilisateur.roles= [role]
+        @user.roles= [role]
 
-        sign_in @utilisateur
+        sign_in @user
       end
 
       it "assigns disponibilite attribué as @disponibilite" do
-        disponibilite = create(:disponibilite_disponible)
+        disponibilite = create(:disponibilite_disponible_with_remplacant)
 
         allow(Disponibilite).to receive(:find).with(disponibilite.id.to_s) { disponibilite }
 
         allow(disponibilite).to receive(:save) { true }
 
-        get :accepter_disponibilite, {:id => disponibilite}
-        assigns(:disponibilite).should eq(disponibilite)
+        get :accept_availability, {:id => disponibilite}
+        expect(assigns(:disponibilite)).to eq(disponibilite)
+        expect(disponibilite.statut).to eq("assigned")
       end
 
 
       it "assigns disponibilites without @events" do
-        disponibilite = create(:disponibilite_disponible)
+        disponibilite = create(:disponibilite_disponible_with_remplacant)
 
         allow(Disponibilite).to receive(:find).with(disponibilite.id.to_s) { disponibilite }
 
         allow(disponibilite).to receive(:save) { false }
 
-        get :accepter_disponibilite, {:id => disponibilite}
+        get :accept_availability, {:id => disponibilite}
 
-        allow(Disponibilite).to receive(:where).with("(statut = 'attente' or statut = 'disponible') and date_heure_debut between :date_debut and :date_fin and utilisateur_remplacant_id = :utilisateur_remplacant_id",{date_debut: Date.current, date_fin: Date.current + 2.months, utilisateur_remplacant_id: @utilisateur.id}){disponibilite}
+        allow(Disponibilite).to receive(:where).with("(statut = 'waiting' or statut = 'available') and date_heure_debut between :date_debut and :date_fin and user_remplacant_id = :user_remplacant_id",{date_debut: Date.current, date_fin: Date.current + 2.months, user_remplacant_id: @user.id}){disponibilite}
 
-        utilisateur_permanent = build(:utilisateur_permanent)
+        user_permanent = build(:user_permanent)
 
-        allow(Utilisateur).to receive(:find).with("titre = 'permanent'") { utilisateur_permanent }
-        response.should redirect_to(disponibilite)
+        allow(User).to receive(:find).with("titre = 'permanent'") { user_permanent }
+        expect(response).to redirect_to(disponibilite)
+        expect(disponibilite.statut).to eq("assigned")
       end
     end
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :utilisateur})
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
 
-      disponibilite = create(:disponibilite_disponible)
+      disponibilite = create(:disponibilite_disponible_with_remplacant)
 
-      get :accepter_disponibilite, {:id => disponibilite}
+      get :accept_availability, {:id => disponibilite}
 
-      response.should redirect_to(new_utilisateur_session_path)
+      expect(response).to redirect_to(new_user_session_path)
+    end
+  end
+
+  describe "GET deny_availability" do
+    describe "valid session" do
+      before(:each) do
+        @user = FactoryGirl.create(:user_remplacant)
+        role = FactoryGirl.create(:role_remplacant)
+        @user.roles= [role]
+
+        sign_in @user
+      end
+
+      it "assigns disponibilite refusé as @disponibilite" do
+        disponibilite = create(:disponibilite_disponible_with_remplacant)
+
+        allow(Disponibilite).to receive(:find).with(disponibilite.id.to_s) { disponibilite }
+
+        allow(disponibilite).to receive(:save) { true }
+
+        get :deny_availability, {:id => disponibilite}
+        expect(assigns(:disponibilite)).to eq(disponibilite)
+        expect(disponibilite.statut).to eq("denied")
+      end
+
+      it "assigns disponibilites without @events" do
+        disponibilite = create(:disponibilite_disponible_with_remplacant)
+
+        allow(Disponibilite).to receive(:find).with(disponibilite.id.to_s) { disponibilite }
+
+        allow(disponibilite).to receive(:save) { false }
+
+        get :deny_availability, {:id => disponibilite}
+
+        allow(Disponibilite).to receive(:where).with("(statut = 'waiting' or statut = 'available') and date_heure_debut between :date_debut and :date_fin and user_remplacant_id = :user_remplacant_id",{date_debut: Date.current, date_fin: Date.current + 2.months, user_remplacant_id: @user.id}){disponibilite}
+
+        user_permanent = build(:user_permanent)
+
+        allow(User).to receive(:find).with("titre = 'permanent'") { user_permanent }
+        expect(response).to redirect_to(disponibilite)
+        expect(disponibilite.statut).to eq("denied")
+      end
+    end
+    it "invalid session" do
+      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
+
+      disponibilite = create(:disponibilite_disponible_with_remplacant)
+
+      get :deny_availability, {:id => disponibilite}
+
+      expect(response).to redirect_to(new_user_session_path)
     end
   end
 end
