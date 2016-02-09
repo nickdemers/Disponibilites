@@ -1,4 +1,5 @@
 class HomeController < ApplicationController
+  include DisponibilitesConcern
 
   before_action :authenticate_user!
 

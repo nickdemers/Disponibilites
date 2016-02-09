@@ -1,11 +1,8 @@
 require 'simplecov'
-SimpleCov.start 'rails' #do
-# add_filter "factories/"
-# add_filter "config/"
-# add_filter 'bin/'
-# add_filter 'db/'
-# add_filter 'script/'
-#end
+SimpleCov.start do
+  add_filter "/features/"
+  add_filter "/spec/"
+end
 
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 ENV["RAILS_ENV"] ||= 'test'

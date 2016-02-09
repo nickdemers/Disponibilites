@@ -1,5 +1,4 @@
-<%- model_class = Disponibilite -%>
-<h1>Disponibilité</h1>
+<h1>Détail de l'absence</h1>
 
 <dl class="dl-horizontal">
   <dt><strong>Utilisateur absent :</strong></dt>
@@ -24,7 +23,7 @@
   <dd><%= get_description_statut(@disponibilite.statut) %></dd>
 </dl>
 
-<% if can? :accepter_disponibilite, @disponibilite and @disponibilite.user_remplacant_id == current_user.id and @disponibilite.statut == "waiting" %>
+<% if can? :accept_availability, @disponibilite and @disponibilite.user_remplacant_id == current_user.id and @disponibilite.statut == "waiting" %>
   <%= link_to "Accepter", accept_disponibilites_path(@disponibilite), :class => 'btn btn-default' %>
   <%= link_to "Refuser", deny_disponibilites_path(@disponibilite), :class => 'btn btn-danger' %>
 <% elsif can? :manage, @disponibilite %>

@@ -2,7 +2,6 @@ class UsersController < ApplicationController
   before_action :authenticate_user!
   #before_action :set_user, only: [:show, :edit, :update, :destroy]
   load_and_authorize_resource
-  before_action :set_disponibilites_avenir, only: [:index, :show, :new, :edit]
 
   # GET /users
   # GET /users.json
@@ -52,8 +51,6 @@ class UsersController < ApplicationController
         format.html { redirect_to @user, notice: t("user.messages.save_creation_succes") }
         format.json { render json: @user, status: :created, location: @user }
       else
-        set_disponibilites_avenir
-
         format.html { render action: "new" }
         format.json { render json: @user.errors, status: :unprocessable_entity }
       end
@@ -74,8 +71,6 @@ class UsersController < ApplicationController
         format.html { redirect_to @user, notice: t("user.messages.save_modification_succes") }
         format.json { head :no_content }
       else
-        set_disponibilites_avenir
-
         format.html { render action: "edit" }
         format.json { render json: @user.errors, status: :unprocessable_entity }
       end
@@ -97,10 +92,6 @@ class UsersController < ApplicationController
     #def set_user
     #  @user = User.find(params[:id])
     #end
-
-    def set_disponibilites_avenir
-      @disponibilites_avenir = get_disponibilites_avenir_non_attribue
-    end
 
     def user_params
       params.require(:user).permit(:email, :message_texte_permis, :niveau, :nom, :numero_cellulaire, :numero_telephone, :prenom, :titre, :password, :role_ids)

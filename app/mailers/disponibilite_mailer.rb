@@ -3,7 +3,7 @@ class DisponibiliteMailer < ApplicationMailer
 
   def nouvelle_disponibilite_email(user, disponibilite)
     @user = user
-    @url  = "http://localhost:3000/disponibilites/" + disponibilite.id.to_s
+    @url  = "http://localhost:3000/disponibilites/" + disponibilite.id.to_s + "/edit"
     #todo remettre --> to: @user.email
     mail(to: "nickdemers@gmail.com", subject: 'Nouvelle disponibilité')
   end

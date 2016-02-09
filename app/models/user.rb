@@ -6,6 +6,8 @@ class User < ActiveRecord::Base
 
   has_and_belongs_to_many :roles
 
+  has_many :demandes
+
   #before_destroy :check_user_in_disponibilite
 
   #def check_user_in_disponibilite
@@ -17,7 +19,6 @@ class User < ActiveRecord::Base
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, #:registerable,
          :recoverable, :rememberable, :trackable, :validatable, :lockable
-  #strong_parameters :email, :message_texte_permis, :niveau, :nom, :numero_cellulaire, :numero_telephone, :prenom, :titre
 
   has_many :disponibilites_absent, :foreign_key => 'user_absent_id', :class_name => 'Disponibilite', :dependent => :restrict_with_exception
   has_many :disponibilites_remplacant, :foreign_key => 'user_remplacant_id', :class_name => 'Disponibilite', :dependent => :restrict_with_exception
@@ -25,6 +26,10 @@ class User < ActiveRecord::Base
   validates_presence_of :nom, :prenom, :numero_telephone, :titre
   validates_length_of :nom, :prenom, :maximum => 255
   validates :niveau, :numericality => { :only_integer => true }, :allow_blank => true
+
+  scope :join_disponibilite_by_user_remplacant, -> { joins("LEFT JOIN disponibilites on disponibilites.user_remplacant_id = users.id") }
+
+  scope :by_next_user_remplacant_available, -> date_heure_debut, date_heure_fin { where(["users.id not in (select user_remplacant_id from disponibilites where (? between disponibilites.date_heure_debut and disponibilites.date_heure_fin) or (? between disponibilites.date_heure_debut and disponibilites.date_heure_fin))", date_heure_debut, date_heure_fin]) }
 
   def password
     @password ||= Password.new(encrypted_password)
@@ -47,5 +52,9 @@ class User < ActiveRecord::Base
     user = find_by_email(email)
     return nil  if user.nil?
     return user if user.valid_password?(password)
+  end
+
+  def self.find_by_next_user_remplacant_available(date_time_start, date_time_end)
+    User.where(titre: 'remplacant').order("id").by_next_user_remplacant_available(date_time_start, date_time_end).first
   end
 end

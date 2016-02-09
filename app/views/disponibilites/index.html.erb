@@ -1,57 +1,106 @@
-<%- model_class = Disponibilite -%>
-<h1>Liste des disponibilités</h1>
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th><%= model_class.human_attribute_name(:id) %></th>
-      <th>Utilisateur absent</th>
-      <th>Utilisateur remplaçant</th>
-      <th>École</th>
-      <th><%= model_class.human_attribute_name(:niveau_id) %></th>
-      <th>Date heure début</th>
-      <th><%= model_class.human_attribute_name(:date_heure_fin) %></th>
-      <th><%= model_class.human_attribute_name(:surveillance) %></th>
-      <th>Spécialité</th>
-      <th><%= model_class.human_attribute_name(:notes) %></th>
-      <th><%= model_class.human_attribute_name(:statut) %></th>
-      <th><%=t '.actions', :default => t("helpers.actions") %></th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @disponibilites.each do |disponibilite| %>
-      <tr>
-        <td><%= link_to disponibilite.id, disponibilite_path(disponibilite) %></td>
-        <td><%= get_user_absent_nom_format(disponibilite) %></td>
-        <td><%= get_user_remplacant_nom_format(disponibilite) %></td>
-        <td><%= disponibilite.ecole.nom %></td>
-        <td><%= get_description_niveau(disponibilite.niveau_id) %></td>
-        <td><%= disponibilite.date_heure_debut.strftime("%Y/%m/%d %H:%M") %></td>
-        <td><%= disponibilite.date_heure_fin.strftime("%Y/%m/%d %H:%M") %></td>
-        <td><%= disponibilite.surveillance %></td>
-        <td><%= disponibilite.specialite %></td>
-        <td><%= disponibilite.notes %></td>
-        <td><%= get_description_statut(disponibilite.statut) %></td>
-        <td>
-          <% if can? :accepter_disponibilite, disponibilite and disponibilite.user_remplacant_id == current_user.id and disponibilite.statut == "waiting" %>
-            <%= link_to "Accepter", disponibilite_path(disponibilite), :class => 'btn btn-default btn-xs' %>
-            <%= link_to "Refuser", disponibilite_path(disponibilite), :class => 'btn btn-default btn-xs' %>
-          <% elsif can? :manage, disponibilite %>
-            <%= link_to t('.edit', :default => t("helpers.links.edit")),
-                        edit_disponibilite_path(disponibilite), :class => 'btn btn-default btn-xs' %>
-            <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
-                        disponibilite_path(disponibilite),
-                        :method => :delete,
-                        :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Êtes-vous certain ?')) },
-                        :class => 'btn btn-xs btn-danger' %>
-          <% end %>
-        </td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+<h1>Liste des absences</h1>
+
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12">
+
+    <div class="box bordered-box blue-border">
+      <div class="box-header blue-background">
+        <%= form_tag disponibilites_path, method: 'get', class: "nifty_form" do |f| %>
+          <div class="row">
+            <div class="col-xs-2 col-sm-2 col-md-2">
+              <div class="float_left" style="margin-right: 5px;">Début</div>
+              <div class="input-group date" id="datepicker">
+                <%= text_field_tag(:date_debut, params[:date_debut], class: "form-control", "data-format" => "yyyy-MM-dd") %>
+                <span class="input-group-btn">
+                  <span class="add-on">&nbsp;<i class="icon-calendar"></i></span>
+                </span>
+              </div>
+            </div>
+
+            <div class="col-xs-2 col-sm-2 col-md-2">
+              <div class="float_left" style="margin-right: 5px;">Fin</div>
+              <div class="input-group date" id="datepicker">
+                <%= text_field_tag(:date_fin, params[:date_fin], class: "form-control", "data-format" => "yyyy/MM/dd") %>
+                <span class="input-group-btn">
+                  <span class="add-on">&nbsp;<i class="icon-calendar"></i></span>
+                </span>
+              </div>
+            </div>
+
+            <div class="col-xs-3 col-sm-3 col-md-2 text-right">
+              <%= submit_tag("Rechercher", class: 'btn btn-default') %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="box-content box-no-padding">
+        <div class="responsive-table">
+          <div class="scrollable-area">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Utilisateur absent</th>
+                  <th>Utilisateur remplaçant</th>
+                  <th>École</th>
+                  <th>Niveau</th>
+                  <th>Date heure début</th>
+                  <th>Date heure fin</th>
+                  <th>Statut</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @disponibilites.each do |disponibilite| %>
+                  <tr>
+                    <td><%= get_user_absent_nom_format(disponibilite) %></td>
+                    <td><%= get_user_remplacant_nom_format(disponibilite) %></td>
+                    <td><%= disponibilite.ecole.nom %></td>
+                    <td><%= get_description_niveau(disponibilite.niveau_id) %></td>
+                    <td><%= disponibilite.date_heure_debut.strftime("%Y/%m/%d %H:%M") %></td>
+                    <td><%= disponibilite.date_heure_fin.strftime("%Y/%m/%d %H:%M") %></td>
+                    <td><span class="badge badge-<%= disponibilite_statut_css(disponibilite.statut) %>"><%= get_description_statut(disponibilite.statut) %></span></td>
+                    <td>
+                      <% if can? :accept_availability, disponibilite and disponibilite.user_remplacant_id == current_user.id and
+                          disponibilite.statut == "waiting" and !is_time_expired?(disponibilite.date_time_expired) %>
+
+                        <%= link_to "Accepter", disponibilite_path(disponibilite), :class => 'btn btn-default btn-xs' %>
+                        <%= link_to "Refuser", disponibilite_path(disponibilite), :class => 'btn btn-default btn-xs' %>
+
+                      <% end %>
+
+                      <% if can? :edit, disponibilite %>
+                        <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                                    edit_disponibilite_path(disponibilite), :class => 'btn btn-default btn-xs' %>
+                      <% end %>
+
+                      <% if can? :manage, disponibilite %>
+
+                        <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                                    disponibilite_path(disponibilite),
+                                    :method => :delete,
+                                    :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Êtes-vous certain ?')) },
+                                    :class => 'btn btn-xs btn-danger' %>
+
+                      <% end %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="text-center">
+  <%= paginate @disponibilites, theme: 'bootstrap3' %>
+</div>
+
 <% if can? :manage, Disponibilite %>
-  <%= link_to t('.new', :default => t("helpers.links.new")),
-              new_disponibilite_path,
-              :class => 'btn btn-primary' %>
+  <%= link_to "Ajouter nouvelle absence", new_disponibilite_path, class: "btn btn-primary" %>
 <% end %>
 
+<%= javascript_include_tag "disponibilites" %>

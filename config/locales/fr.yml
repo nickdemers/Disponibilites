@@ -141,11 +141,18 @@ fr:
       update: Modifier
   disponibilite:
     messages:
-      save_creation_succes: La disponibilité a été créée avec succès.
-      save_modification_succes: La disponibilité a été modifiée avec succès.
+      save_creation_succes: L'absence a été créée avec succès.
+      save_modification_succes: L'absence a été modifiée avec succès.
+      save_modification_erreur: Une erreur est survenue. L'absence n'a pas été modifiée.
+      accept_availability_succes: L'absence a été acceptée avec succès.
+      accept_availability_error: Une erreur est survenue. L'absence n'a pu être accepté.
+      accept_availability_time_expired: Votre temps pour répondre est écoulé. Il n'est plus possible de l'accepter.
+      deny_availability_success: L'absence a été refusée avec succès.
+      deny_availability_error: Une erreur est survenue. L'absence n'a pu être refusée.
+      deny_availability_time_expired: Votre temps pour répondre est écoulé. Il n'est plus possible de la refuser.
     erreurs:
       aucun_user_absent_disponible: 'Aucun utilisateur absent disponible.'
-      save_disponibilite: 'la sauvegarde de cette disponibilité :'
+      save_disponibilite: 'la sauvegarde de cette absence :'
   role:
     messages:
       save_creation_succes: Le rôle a été créé avec succès.
@@ -223,4 +230,6 @@ fr:
       long: ! '%A %d %B %Y %H h %M'
       short: ! '%H h %M'
     pm: pm
+  "true": "Oui"
+  "false": "Non"
 

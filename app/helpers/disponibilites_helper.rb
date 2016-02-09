@@ -21,7 +21,7 @@ module DisponibilitesHelper
 
   def get_date_heure_format
     if !@disponibilite.nil? and !@disponibilite.date_heure_debut.nil? and !@disponibilite.date_heure_fin.nil?
-      return @disponibilite.date_heure_debut.strftime("%Y/%m/%d %l:%M %p") + " - " + @disponibilite.date_heure_fin.strftime("%Y/%m/%d %l:%M %p")
+      return format_date_heure(@disponibilite.date_heure_debut) + " - " + format_date_heure(@disponibilite.date_heure_fin)
     else
       return ""
     end
@@ -29,17 +29,27 @@ module DisponibilitesHelper
 
   def get_date_heure_debut_format
     if @disponibilite.nil? or @disponibilite.date_heure_debut.nil? then
-      return DateTime.now.strftime("%Y/%m/%d %l:%M %p")
+      date_time = DateTime.now + 1.day
+      return format_date_heure(date_time.change(hour: 7, min: 30))
     else
-      return @disponibilite.date_heure_debut.strftime("%Y/%m/%d %l:%M %p")
+      return format_date_heure(@disponibilite.date_heure_debut)
     end
   end
 
   def get_date_heure_fin_format
     if @disponibilite.nil? or @disponibilite.date_heure_fin.nil? then
-      return DateTime.now.strftime("%Y/%m/%d %l:%M %p")
+      date_time = DateTime.now + 1.day
+      return format_date_heure(date_time.change(hour: 16, min: 30))
     else
-      return @disponibilite.date_heure_fin.strftime("%Y/%m/%d %l:%M %p")
+      return format_date_heure(@disponibilite.date_heure_fin)
+    end
+  end
+
+  def format_date_heure(date_heure)
+    if date_heure
+      return date_heure.strftime("%Y/%m/%d %l:%M %p")
+    else
+      return ""
     end
   end
 
@@ -59,31 +69,21 @@ module DisponibilitesHelper
     end
   end
 
-  def get_disponibilites_avenir_non_attribue(date_heure_debut = Date.current, date_heure_fin = Date.current + 2.months)
-    if current_user.role? :admin or current_user.role? :super_admin then
-      liste_disponibilites = Disponibilite.where("(statut = 'waiting' or statut = 'available') and date_heure_debut between :date_debut and :date_fin", {date_debut: date_heure_debut, date_fin: date_heure_fin})
-    elsif current_user.role? :permanent then
-      liste_disponibilites = Disponibilite.where("(statut = 'waiting' or statut = 'available') and date_heure_debut between :date_debut and :date_fin and user_absent_id = :user_absent_id", {date_debut: date_heure_debut, date_fin: date_heure_fin, user_absent_id: current_user.id})
-    elsif current_user.role? :remplacant then
-      liste_disponibilites = Disponibilite.where("(statut = 'waiting' or statut = 'available') and date_heure_debut between :date_debut and :date_fin and user_remplacant_id = :user_remplacant_id", {date_debut: date_heure_debut, date_fin: date_heure_fin, user_remplacant_id: current_user.id})
-    end
-    if !liste_disponibilites.nil? then
-      return liste_disponibilites.order("date_heure_debut").first(10)
+  def disponibilite_statut_css(statut)
+    if statut.eql?("assigned")
+      "success"
+    elsif statut.eql?("waiting")
+      "warning"
     else
-      return liste_disponibilites
+      "danger"
     end
   end
 
-  def get_disponibilites(date_heure_debut = Date.current, date_heure_fin = Date.current + 2.months)
-    if current_user.role? :admin or current_user.role? :super_admin then
-      liste_disponibilites = Disponibilite.where("date_heure_debut between :date_debut and :date_fin", {date_debut: date_heure_debut, date_fin: date_heure_fin})
-    elsif current_user.role? :permanent then
-      liste_disponibilites = Disponibilite.where("date_heure_debut between :date_debut and :date_fin and user_absent_id = :user_absent_id", {date_debut: date_heure_debut, date_fin: date_heure_fin, user_absent_id: current_user.id})
-    elsif current_user.role? :remplacant then
-      liste_disponibilites = Disponibilite.where("date_heure_debut between :date_debut and :date_fin and user_remplacant_id = :user_remplacant_id", {date_debut: date_heure_debut, date_fin: date_heure_fin, user_remplacant_id: current_user.id})
+  def is_time_expired?(date_time)
+    if (date_time + 3.hours) < Time.current
+      return true
+    else
+      return false
     end
-
-    return liste_disponibilites
-
   end
 end

@@ -193,4 +193,19 @@ describe User do
       userAuthenticate.should be_nil
     end
   end
+
+  describe "find_by_next_user_remplacant_available" do
+    specify "succes" do
+      date_time_start = double
+      date_time_end = double
+      user = double
+
+      expect(User).to receive(:where).with(titre: 'remplacant') {user}
+      expect(user).to receive(:order).with("id") {user}
+      expect(user).to receive(:by_next_user_remplacant_available).with(date_time_start, date_time_end) {user}
+      expect(user).to receive(:first) {user}
+
+      User.find_by_next_user_remplacant_available(date_time_start, date_time_end)
+    end
+  end
 end

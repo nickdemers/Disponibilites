@@ -11,7 +11,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150315232718) do
+ActiveRecord::Schema.define(version: 20160130190415) do
+
+  create_table "demandes", force: :cascade do |t|
+    t.integer  "user_id",          limit: 4
+    t.integer  "disponibilite_id", limit: 4
+    t.integer  "priority",         limit: 4
+    t.string   "status",           limit: 255
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  add_index "demandes", ["disponibilite_id"], name: "index_demandes_on_disponibilite_id", using: :btree
+  add_index "demandes", ["user_id"], name: "index_demandes_on_user_id", using: :btree
 
   create_table "disponibilites", force: :cascade do |t|
     t.integer  "user_absent_id",     limit: 4
@@ -26,6 +38,7 @@ ActiveRecord::Schema.define(version: 20150315232718) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "ecole_id",           limit: 4
+    t.datetime "date_time_expired"
   end
 
   add_index "disponibilites", ["ecole_id"], name: "index_disponibilites_on_ecole_id", using: :btree
@@ -36,6 +49,15 @@ ActiveRecord::Schema.define(version: 20150315232718) do
     t.string   "numero_telephone", limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "remplacements", force: :cascade do |t|
+    t.integer  "id_utilisateur",            limit: 4
+    t.string   "id_event_calendar",         limit: 255
+    t.integer  "id_utilisateur_remplacant", limit: 4
+    t.string   "statut",                    limit: 255
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
   end
 
   create_table "roles", force: :cascade do |t|
@@ -79,5 +101,7 @@ ActiveRecord::Schema.define(version: 20150315232718) do
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   add_index "users", ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
 
+  add_foreign_key "demandes", "disponibilites"
+  add_foreign_key "demandes", "users"
   add_foreign_key "disponibilites", "ecoles"
 end

@@ -1,0 +1,20 @@
+@import 'flatty/theme-colors';
+@import 'flatty/bootstrap/bootstrap';
+@import 'flatty/jquery/jquery_ui';
+@import 'flatty/plugins/plugins';
+@import 'flatty/light-theme';
+@import 'plugins/daterangepicker-bs3';
+@import 'bootstrap_and_overrides';
+@import 'plugins/datepicker';
+
+body {
+  padding-top: 60px;
+}
+
+.float_left {
+  float: left;
+}
+
+.float_right {
+  float: right;
+}

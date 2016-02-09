@@ -1,0 +1,19 @@
+<ul class="nav navbar-nav">
+  <li><%= link_to "Gestion des absences", "/disponibilites"  %></li>
+  <% if can? :manage, User %>
+      <li><%= link_to "Gestion des utilisateurs", "/users"  %></li>
+  <% end
+     if can? :update, Role %>
+      <li><%= link_to "Gestion des rôles", "/roles"  %></li>
+  <% end
+     if can? :update, Ecole %>
+      <li><%= link_to "Gestion des écoles", "/ecoles"  %></li>
+  <% end %>
+</ul>
+
+<ul class="nav navbar-nav pull-right">
+  <% if can? :update, current_user %>
+      <li><%= link_to 'Modifier votre compte', edit_user_path(current_user) %></li>
+  <% end %>
+  <li><%= link_to "Déconnection", destroy_user_session_path, :method => :delete %></li>
+</ul>

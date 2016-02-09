@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= content_for?(:title) ? yield(:title) : "Disponibilités" %></title>
+    <title><%= content_for?(:title) ? yield(:title) : "Gestionnaire d'absence" %></title>
     <%= csrf_meta_tags %>
 
     <%= stylesheet_link_tag "application", :media => "all" %>
@@ -41,64 +41,29 @@
         <div class="navbar navbar-inverse navbar-fixed-top">
           <div class="navbar-inner">
             <div class="container-fluid">
-
-              <a class="navbar-brand" href="/">Disponibilités</a>
+              <a class="navbar-brand" href="/">Accueil</a>
               <div class="navbar-collapse collapse navbar-responsive-collapse">
-
-                <ul class="nav navbar-nav">
-                  <li><%= link_to "Gestion des disponibilités", "/disponibilites"  %></li>
-                  <% if can? :manage, User %>
-                    <li><%= link_to "Gestion des utilisateurs", "/users"  %></li>
-                  <% end
-                     if can? :update, Role %>
-                    <li><%= link_to "Gestion des rôles", "/roles"  %></li>
-                  <% end
-                     if can? :update, Ecole %>
-                    <li><%= link_to "Gestion des écoles", "/ecoles"  %></li>
-                  <% end %>
-                </ul>
-
-                <ul class="nav navbar-nav pull-right">
-                <% if can? :update, current_user %>
-                  <li><%= link_to 'Modifier votre compte', edit_user_path(current_user) %></li>
-                <% end %>
-                  <li><%= link_to "Déconnection", destroy_user_session_path, :method => :delete %></li>
-                </ul>
+                <%= render "shared/navigation" %>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="container-fluid">
-          <div class="row-fluid">
-            <div class="col-lg-3">
-           <!-- <div class="span3">  -->
-              <div class="well sidebar-nav">
-                <ul class="nav nav-list">
-                  <li class="nav-header"><bold>Disponibilités à venir</bold></li>
-                  <% if !@disponibilites_avenir.nil? then
-                       @disponibilites_avenir.each do |d| %>
-                  <li><%= link_to d.date_heure_debut.strftime("%Y/%m/%d") + " - " + get_user_absent_nom_format(d), disponibilite_path(d) %></li>
-                      <%   end
-                         end %>
-                </ul>
-              </div><!--/.well -->
-            </div>
-            <div class="col-lg-9">
-            <!--<div class="span9">-->
+        <div class="container">
+          <div class="row">
+
+            <div class="col-sm-12 col-md-12 col-lg-12">
 
               <%= bootstrap_flash %>
               <%= yield %>
 
-            </div><!--/span-->
-          </div><!--/row-->
-
-          <hr />
+            </div>
+          </div>
 
           <footer id='footer'>
             <p>&copy; Solutions Demers.TI inc.</p>
           </footer>
-        </div> <!-- /container -->
+        </div>
       </body>
     <% elsif controller_name != 'passwords' %>
       <%= render :partial => 'connection' %>

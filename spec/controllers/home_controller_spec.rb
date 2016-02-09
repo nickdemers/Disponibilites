@@ -11,27 +11,10 @@ describe HomeController do
 
         sign_in user
 
-        disponibilite = create(:disponibilite_disponible)
-
-        allow(Disponibilite).to receive(:where).with("(statut = 'waiting' or statut = 'available') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) {disponibilite}
-        allow(disponibilite).to receive(:order).with("date_heure_debut") {disponibilite}
-        allow(disponibilite).to receive(:first).with(10) {disponibilite}
+        expect(controller).to receive(:get_disponibilites_avenir_non_attribue)
 
         get 'index'
 
-      end
-    end
-    describe "Menu sans disponibilité" do
-      it "user connecté, afficher le contenu" do
-        user = FactoryGirl.create(:user_admin)
-        role = FactoryGirl.create(:role)
-        user.roles= [role]
-
-        sign_in user
-
-        allow(Disponibilite).to receive(:where).with("(statut = 'waiting' or statut = 'available') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) {nil}
-
-        get 'index'
       end
     end
   end

@@ -1,7 +1,7 @@
 class CreateRolesUtilisateurs < ActiveRecord::Migration
   def self.up
     create_table :roles_utilisateurs, :id => false do |t|
-      t.references :role, :user
+      t.references :role, :utilisateur
     end
   end
 

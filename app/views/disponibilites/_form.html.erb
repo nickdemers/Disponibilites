@@ -16,30 +16,39 @@
   <% end %>
 
   <div class="form-group">
+    <label class="control-label col-lg-2">Temps restant pour répondre</label>
+    <div class="col-lg-6">
+      <div class="countdown">
+        <span id="clock"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
     <%= f.label :user_absent_id, "Utilisateur absent", :class => 'control-label col-lg-2' %>
     <div class="col-lg-6">
-      <%= f.select(:user_absent_id, @user_absent.collect {|p| [ p.prenom + ' ' + p.nom, p.id ] },{include_blank: ''}, :class => 'form-control') %>
+      <%= f.select(:user_absent_id, @user_absent.collect {|p| [ p.prenom + ' ' + p.nom, p.id ] }, {}, :class => 'form-control', disabled: disabled) %>
     </div>
     <%=f.error_span(:user_absent_id) %>
   </div>
   <div class="form-group">
     <%= f.label :user_remplacant_id, "Utilisateur remplaçant", :class => 'control-label col-lg-2' %>
     <div class="col-lg-6">
-      <%= f.text_field :user_remplacant_id, :value => get_user_remplacant_nom_format(@disponibilite), :class => 'form-control', :disabled => 'disabled' %>
+      <%= f.text_field :user_remplacant_id, :value => get_user_remplacant_nom_format(@disponibilite), :class => 'form-control', disabled: true %>
     </div>
     <%=f.error_span(:user_remplacant_id) %>
   </div>
   <div class="form-group">
     <%= f.label :ecole_id, "École", :class => 'control-label col-lg-2' %>
     <div class="col-lg-6">
-      <%= f.select(:ecole_id, Ecole.all.collect {|p| [ p.nom, p.id ] }, {include_blank: ''}, :class => 'form-control') %>
+      <%= f.select(:ecole_id, Ecole.all.collect {|p| [ p.nom, p.id ] }, {include_blank: ''}, :class => 'form-control', disabled: disabled) %>
     </div>
     <%=f.error_span(:ecole_id) %>
   </div>
   <div class="form-group">
     <%= f.label :niveau_id, :class => 'control-label col-lg-2' %>
     <div class="col-lg-6">
-      <%= f.select(:niveau_id, UsersHelper::LISTE_NIVEAU, {include_blank: ''}, :class => 'form-control') %>
+      <%= f.select(:niveau_id, UsersHelper::LISTE_NIVEAU, {include_blank: ''}, :class => 'form-control', disabled: disabled) %>
     </div>
     <%=f.error_span(:niveau_id) %>
   </div>
@@ -58,25 +67,26 @@
 
   <%= f.hidden_field :date_heure_debut, :value => get_date_heure_debut_format %>
   <%= f.hidden_field :date_heure_fin, :value => get_date_heure_fin_format %>
+  <%= f.hidden_field :created_at, :value => @date_heure_limit_answer %>
 
   <div class="form-group">
     <%= f.label :surveillance, :class => 'control-label col-lg-2' %>
     <div class="col-lg-10">
-      <%= f.check_box :surveillance %>
+      <%= f.check_box :surveillance, disabled: disabled %>
     </div>
     <%=f.error_span(:surveillance) %>
   </div>
   <div class="form-group">
     <%= f.label :specialite, "Spécialité", :class => 'control-label col-lg-2' %>
     <div class="col-lg-10">
-      <%= f.check_box :specialite %>
+      <%= f.check_box :specialite, disabled: disabled %>
     </div>
     <%=f.error_span(:specialite) %>
   </div>
   <div class="form-group">
     <%= f.label :notes, :class => 'control-label col-lg-2' %>
     <div class="col-lg-6">
-      <%= f.text_area :notes, :class => 'form-control' %>
+      <%= f.text_area :notes, :class => 'form-control', disabled: disabled %>
     </div>
     <%=f.error_span(:notes) %>
   </div>
@@ -90,25 +100,55 @@
 
   <div class="form-group">
     <div class="col-lg-offset-2 col-lg-10">
-      <%= f.submit nil, :class => 'btn btn-primary' %>
+
+      <% if can? :accept_availability, @disponibilite and @disponibilite.user_remplacant_id == current_user.id and
+          @disponibilite.statut == "waiting" and !is_time_expired?(@disponibilite.date_time_expired) %>
+
+        <%= link_to "Accepter", accept_disponibilites_path(@disponibilite), :class => 'btn btn-primary' %>
+        <%= link_to "Refuser", deny_disponibilites_path(@disponibilite), :class => 'btn btn-danger' %>
+
+      <% elsif can? :manage, f.object %>
+
+        <%= f.submit nil, :class => 'btn btn-primary' %>
+        <% unless f.object.id.nil? %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      disponibilite_path(f.object),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Êtes-vous certain ?')) },
+                      :class => 'btn btn-danger' %>
+        <% end %>
+      <% end %>
       <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
-                disponibilites_path, :class => 'btn btn-default' %>
+                  disponibilites_path, :class => 'btn btn-default' %>
     </div>
   </div>
 
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $('.datepicker').daterangepicker({
-                timePicker: true,
-                timePickerIncrement: 30,
-                format: 'YYYY/MM/DD h:mm A',
-                startDate: $('#disponibilite_date_heure_debut').val(),
-                endDate: $('#disponibilite_date_heure_fin').val()
-            }, function (start, end, label) {
-                $('#disponibilite_date_heure_debut').val(start.format('YYYY/MM/DD h:mm A'));
-                $('#disponibilite_date_heure_fin').val(end.format('YYYY/MM/DD h:mm A'));
-            });
+  <%= javascript_include_tag 'disponibilites' %>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+
+      if ('<%= disabled %>' == 'false') {
+        $('.datepicker').daterangepicker({
+          timePicker: true,
+          timePickerIncrement: 30,
+          format: 'YYYY/MM/DD h:mm A',
+          startDate: $('#disponibilite_date_heure_debut').val(),
+          endDate: $('#disponibilite_date_heure_fin').val()
+        }, function (start, end, label) {
+          $('#disponibilite_date_heure_debut').val(start.format('YYYY/MM/DD h:mm A'));
+          $('#disponibilite_date_heure_fin').val(end.format('YYYY/MM/DD h:mm A'));
         });
-    </script>
+      }
+
+      if ($('#disponibilite_user_remplacant_id').val() != "") {
+        display_clock('#clock', $('#disponibilite_created_at').val());
+      }
+
+    });
+
+  </script>
 
 <% end %>
+
+

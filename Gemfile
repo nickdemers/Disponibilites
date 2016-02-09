@@ -35,8 +35,13 @@ gem 'cancancan', '~> 1.10'
 gem 'bcrypt-ruby'
 gem 'bcrypt', '~> 3.1.7'
 
+gem 'rails_admin', git: 'git@github.com:sferik/rails_admin.git'
+gem 'rails_admin-i18n'
+
 # Gem for validation if teacher is available
-gem 'acts_as_bookable', git: 'git@github.com:groupefungo/acts_as_bookable'
+#gem 'acts_as_bookable', git: 'git@github.com:groupefungo/acts_as_bookable'
+
+gem 'kaminari'
 
 group :doc do
   # bundle exec rake doc:rails generates the API under doc/api.
