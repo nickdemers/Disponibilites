@@ -29,7 +29,9 @@ class User < ActiveRecord::Base
 
   scope :join_disponibilite_by_user_remplacant, -> { joins("LEFT JOIN disponibilites on disponibilites.user_remplacant_id = users.id") }
 
-  scope :by_next_user_remplacant_available, -> date_heure_debut, date_heure_fin { where(["users.id not in (select user_remplacant_id from disponibilites where (? between disponibilites.date_heure_debut and disponibilites.date_heure_fin) or (? between disponibilites.date_heure_debut and disponibilites.date_heure_fin))", date_heure_debut, date_heure_fin]) }
+  scope :by_next_user_remplacant_available, -> date_heure_debut, date_heure_fin { where(["users.id not in (select COALESCE(user_remplacant_id,0) from disponibilites where (? between disponibilites.date_heure_debut and disponibilites.date_heure_fin) or (? between disponibilites.date_heure_debut and disponibilites.date_heure_fin))", date_heure_debut, date_heure_fin]) }
+
+  scope :by_user_not_in_demande_with_dispo_id, -> disponibilite_id {where(["users.id not in (select COALESCE(user_id,0) from demandes where disponibilite_id = ?)", disponibilite_id]) if disponibilite_id}
 
   def password
     @password ||= Password.new(encrypted_password)
@@ -54,7 +56,7 @@ class User < ActiveRecord::Base
     return user if user.valid_password?(password)
   end
 
-  def self.find_by_next_user_remplacant_available(date_time_start, date_time_end)
-    User.where(titre: 'remplacant').order("id").by_next_user_remplacant_available(date_time_start, date_time_end).first
+  def self.find_by_next_user_remplacant_available(date_time_start, date_time_end, disponibilite_id)
+    where(titre: 'remplacant').order("id").by_next_user_remplacant_available(date_time_start, date_time_end).by_user_not_in_demande_with_dispo_id(disponibilite_id).first
   end
 end

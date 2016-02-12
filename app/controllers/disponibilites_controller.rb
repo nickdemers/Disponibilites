@@ -6,7 +6,8 @@ class DisponibilitesController < ApplicationController
   before_action :authenticate_user!
   load_and_authorize_resource :except => [:for_calendar]
 
-  # GET /disponibilites
+  before_action :obtain_user_absent, only: [:new, :edit]
+
   def index
     date = Date.new(Date.current.year, Date.current.month, 01)
     date_debut = params[:date_debut] ||= date.strftime("%Y/%m/%d")
@@ -22,90 +23,68 @@ class DisponibilitesController < ApplicationController
     end
   end
 
-  # GET /disponibilites/new
   def new
-    obtain_user_absent
-
-    respond_to do |format|
-      if @user_absent.blank?
-        format.html { redirect_to disponibilites_url, alert: t("disponibilite.erreurs.aucun_user_absent_disponible") }
-        #format.json { head :no_content }
-       else
-         format.html # new.html.erb
-        #format.json { render json: @disponibilite }
-      end
-    end
+    @disabled = false
+    redirect_to disponibilites_url, alert: t("disponibilite.erreurs.aucun_user_absent_disponible") if @user_absent.blank?
   end
 
-  # GET /disponibilites/1/edit
   def edit
-    obtain_user_absent
     @disabled = false
-    @disabled = true if current_user.role? :remplacant
+    @disabled = true if current_user.role? :remplacant or @disponibilite.statut == "canceled"
     @date_heure_limit_answer = date_heure_limit_answer(@disponibilite)
   end
 
-  # POST /disponibilites
   def create
-    @user_remplacant = User.find_by_next_user_remplacant_available(@disponibilite.date_heure_debut, @disponibilite.date_heure_fin)
+    @user_remplacant = User.find_by_next_user_remplacant_available(@disponibilite.date_heure_debut, @disponibilite.date_heure_fin, nil)
 
     @disponibilite.date_time_expired = DateTime.current + 3.hours
     @disponibilite.user_remplacant = @user_remplacant unless @user_remplacant.nil?
     @disponibilite.statut = "waiting"
 
-    respond_to do |format|
+    if @disponibilite.save
 
-      if @disponibilite.save
-
-        #if !@user_remplacant.nil?
-        #  @user_remplacant.each_with_index do |remplacant, index|
-            #demande = Demande.new(:user => remplacant, :disponibilite => @disponibilite, :status => "waiting", :priority => index)
-            #demande.save
-        #    DisponibiliteMailer.nouvelle_disponibilite_email(remplacant, @disponibilite).deliver_later
-        #  end
-        #end
-
-        unless @user_remplacant.nil?
-          DisponibiliteMailer.nouvelle_disponibilite_email(@disponibilite.user_remplacant, @disponibilite).deliver_later
-        end
-
-        format.html { redirect_to edit_disponibilite_path(id: @disponibilite.id), notice: t("disponibilite.messages.save_creation_succes") }
-        #format.json { render action: 'show', status: :created, location: @disponibilite }
-      else
-        obtain_user_absent
-
-        format.html { render action: 'new' }
-        #format.json { render json: @disponibilite.errors, status: :unprocessable_entity }
+      unless @user_remplacant.nil?
+        Demande.create!(user_id: @user_remplacant.id, disponibilite_id: @disponibilite.id, status: "waiting")
+        DisponibiliteMailer.nouvelle_disponibilite_email(@disponibilite.user_remplacant, @disponibilite).deliver_later
       end
+
+      redirect_to edit_disponibilite_path(id: @disponibilite.id), notice: t("disponibilite.messages.save_creation_succes")
+    else
+      obtain_user_absent
+
+      render action: 'new'
     end
   end
 
-  # PATCH/PUT /disponibilites/1
   def update
-    respond_to do |format|
-      if @disponibilite.update(disponibilite_params)
-        format.html { redirect_to edit_disponibilite_path(id: @disponibilite.id), notice: t("disponibilite.messages.save_modification_succes") }
-        #format.json { head :no_content }
-      else
-        obtain_user_absent
-        format.html { render action: 'edit' }
-        #format.json { render json: @disponibilite.errors, status: :unprocessable_entity }
-      end
+    if @disponibilite.update(disponibilite_params)
+      redirect_to edit_disponibilite_path(id: @disponibilite.id), notice: t("disponibilite.messages.save_modification_succes")
+    else
+      obtain_user_absent
+      render action: 'edit'
     end
   end
 
-  # DELETE /disponibilites/1
-  def destroy
-    @disponibilite.destroy
-    respond_to do |format|
-      format.html { redirect_to disponibilites_url }
-      #format.json { head :no_content }
+  def cancel
+    @disponibilite.statut = "canceled"
+    @disponibilite.user_remplacant = nil
+    @disponibilite.date_time_expired = nil
+    if @disponibilite.save
+      redirect_to edit_disponibilite_path(id: @disponibilite.id), notice: t("disponibilite.messages.save_cancel_succes")
+    else
+      obtain_user_absent
+      render action: 'edit'
     end
   end
+
+  # def destroy
+  #   @disponibilite.destroy
+  #   redirect_to disponibilites_url
+  # end
 
   def for_calendar
     liste_disponibilites = get_disponibilites(Time.at(params[:start].to_i).to_date,Time.at(params[:end].to_i).to_date)
-    if !liste_disponibilites.nil? then
+    unless liste_disponibilites.nil?
       @events = liste_disponibilites.map do |d|
         { :id => d.id,
           :title => d.date_heure_debut.strftime("%H:%M") + " - " + d.date_heure_fin.strftime("%H:%M"),
@@ -125,17 +104,13 @@ class DisponibilitesController < ApplicationController
   def accept_availability
     @disponibilite.statut= "assigned"
 
-    respond_to do |format|
-      if !is_time_expired?(@disponibilite.date_time_expired)
-        if @disponibilite.save
-          format.html { redirect_to edit_disponibilite_path(id: @disponibilite.id), notice: t("disponibilite.messages.accept_availability_succes") }
-          #format.json { head :no_content }
-        else
-          format.html { redirect_to edit_disponibilite_path(id: @disponibilite.id), warning: t("disponibilite.messages.accept_availability_error") }
-          #format.json { render json: @disponibilite.errors, status: :unprocessable_entity }
-        end
+    if is_time_expired?(@disponibilite.date_time_expired)
+      redirect_to edit_disponibilite_path(id: @disponibilite.id), warning: t("disponibilite.messages.accept_availability_time_expired")
+    else
+      if @disponibilite.save
+        redirect_to edit_disponibilite_path(id: @disponibilite.id), notice: t("disponibilite.messages.accept_availability_succes")
       else
-        format.html { redirect_to edit_disponibilite_path(id: @disponibilite.id), warning: t("disponibilite.messages.accept_availability_time_expired") }
+        redirect_to edit_disponibilite_path(id: @disponibilite.id), warning: t("disponibilite.messages.accept_availability_error")
       end
     end
   end
@@ -143,28 +118,25 @@ class DisponibilitesController < ApplicationController
   def deny_availability
     @disponibilite.statut= "denied"
 
-    respond_to do |format|
-      if !is_time_expired?(@disponibilite.date_time_expired)
-
-        # TODO ND ne pas chercher dans les remplacants celui qui vient de la refuser..
-        @user_remplacant = User.find_by_next_user_remplacant_available(@disponibilite.date_heure_debut, @disponibilite.date_heure_fin)
-        if @user_remplacant.nil?
-          @disponibilite.user_remplacant = nil
-        else
-          @disponibilite.user_remplacant = @user_remplacant
-          @disponibilite.date_time_expired = DateTime.current + 3.hours
-          @disponibilite.statut = "waiting"
-        end
-
-        if @disponibilite.save
-          format.html { redirect_to disponibilites_path, notice: t("disponibilite.messages.deny_availability_success") }
-          #format.json { head :no_content }
-        else
-          format.html { redirect_to edit_disponibilite_path(id: @disponibilite.id), warning: t("disponibilite.messages.deny_availability_error") }
-          #format.json { render json: @disponibilite.errors, status: :unprocessable_entity }
-        end
+    if is_time_expired?(@disponibilite.date_time_expired)
+      redirect_to edit_disponibilite_path(id: @disponibilite.id), warning: t("disponibilite.messages.deny_availability_time_expired")
+    else
+      @user_remplacant = User.find_by_next_user_remplacant_available(@disponibilite.date_heure_debut, @disponibilite.date_heure_fin, @disponibilite.id)
+      if @user_remplacant.nil?
+        @disponibilite.user_remplacant = nil
+        @disponibilite.date_time_expired = nil
       else
-        format.html { redirect_to edit_disponibilite_path(id: @disponibilite.id), warning: t("disponibilite.messages.deny_availability_time_expired") }
+        @disponibilite.user_remplacant = @user_remplacant
+        @disponibilite.date_time_expired = DateTime.current + 3.hours
+        @disponibilite.statut = "waiting"
+
+        Demande.create!(user_id: @user_remplacant.id, disponibilite_id: @disponibilite.id, status: "waiting")
+      end
+
+      if @disponibilite.save
+        redirect_to disponibilites_path, notice: t("disponibilite.messages.deny_availability_success")
+      else
+        redirect_to edit_disponibilite_path(id: @disponibilite.id), warning: t("disponibilite.messages.deny_availability_error")
       end
     end
   end

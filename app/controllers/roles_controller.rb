@@ -4,26 +4,13 @@ class RolesController < ApplicationController
 
   def index
     @roles = Role.all
-
-    respond_to do |format|
-      format.html # new.html.erb
-      format.json { render json: @roles }
-    end
   end
 
   def show
-    respond_to do |format|
-      format.html # new.html.erb
-      format.json { render json: @role }
-    end
   end
 
   def new
     @role = Role.new
-    respond_to do |format|
-      format.html # new.html.erb
-      format.json { render json: @role }
-    end
   end
 
   def edit
@@ -31,36 +18,24 @@ class RolesController < ApplicationController
 
   def create
     @role = Role.new(role_params)
-    respond_to do |format|
-      if @role.save
-        format.html { redirect_to @role, notice: t("role.messages.save_creation_succes") }
-        format.json { render json: @role, status: :created, location: @role }
-      else
-        format.html { render action: "new" }
-        format.json { render json: @role.errors, status: :unprocessable_entity }
-      end
+    if @role.save
+      redirect_to @role, notice: t("role.messages.save_creation_succes")
+    else
+      render action: "new"
     end
   end
 
   def update
-    respond_to do |format|
-      if @role.update(role_params)
-        format.html { redirect_to @role, notice: t("role.messages.save_modification_succes") }
-        format.json { head :no_content }
-      else
-        format.html { render action: "edit" }
-        format.json { render json: @role.errors, status: :unprocessable_entity }
-      end
+    if @role.update(role_params)
+      redirect_to @role, notice: t("role.messages.save_modification_succes")
+    else
+      render action: "edit"
     end
   end
 
   def destroy
     @role.destroy
-
-    respond_to do |format|
-      format.html { redirect_to roles_path }
-      format.json { head :no_content }
-    end
+    redirect_to roles_path
   end
 
   private

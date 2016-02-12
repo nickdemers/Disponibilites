@@ -83,61 +83,10 @@ describe DisponibilitesController do
     end
 
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authorize!).and_throw(:warden, {:scope => :user})
       get :index, {}
       expect(response).to redirect_to(new_user_session_path)
     end
   end
-
-  # describe "GET show" do
-  #   describe "valid session" do
-  #     describe "assigns the requested disponibilite as @disponibilite" do
-  #       before(:each) do
-  #         user = FactoryGirl.create(:user_admin)
-  #         role = FactoryGirl.create(:role)
-  #         user.roles= [role]
-  #
-  #         sign_in user
-  #
-  #         allow(Disponibilite).to receive(:where).with("(statut = 'waiting' or statut = 'available') and date_heure_debut between :date_debut and :date_fin",{date_debut: Date.current, :date_fin=> Date.current + 2.months}) {nil}
-  #       end
-  #
-  #       it "with user_remplacant" do
-  #         disponibilite = create(:disponibilite_attribue)
-  #
-  #         allow(Disponibilite).to receive(:find).with(disponibilite.id.to_s) { disponibilite }
-  #
-  #         user_absent = create(:user_permanent2)
-  #         allow(User).to receive(:find).with(disponibilite.user_absent) { user_absent }
-  #
-  #         user_remplacant = create(:user_remplacant2)
-  #         allow(User).to receive(:find).with(disponibilite.user_remplacant) { user_remplacant }
-  #
-  #         get :show, {:id => disponibilite}
-  #         expect(assigns(:disponibilite)).to eq(disponibilite)
-  #       end
-  #       it "without user_remplacant" do
-  #         disponibilite = create(:disponibilite_disponible)
-  #
-  #         allow(Disponibilite).to receive(:find).with(disponibilite.id.to_s) { disponibilite }
-  #
-  #         user_absent = create(:user_permanent2)
-  #         allow(User).to receive(:find).with(disponibilite.user_absent) { user_absent }
-  #
-  #         get :show, {:id => disponibilite}
-  #         expect(assigns(:disponibilite)).to eq(disponibilite)
-  #       end
-  #     end
-  #   end
-  #   it "invalid session" do
-  #     allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
-  #     disponibilite = create(:disponibilite_disponible)
-  #
-  #     get :show, {:id => disponibilite}
-  #
-  #     is_expected.to redirect_to(new_user_session_path)
-  #   end
-  # end
 
   describe "GET new" do
     describe "valid session" do
@@ -206,8 +155,6 @@ describe DisponibilitesController do
       end
     end
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
-
       get :new, {}
 
       is_expected.to redirect_to(new_user_session_path)
@@ -219,21 +166,26 @@ describe DisponibilitesController do
       describe "user with permitted roles" do
         it "success" do
           @user = FactoryGirl.create(:user_admin)
+          role = FactoryGirl.create(:role)
+          @user.roles= [role]
+
           sign_in @user
+          allow(controller).to receive(:current_user) { @user }
           allow(controller).to receive(:authenticate_user!)
 
-          @disponibilite = double
-          expect(Disponibilite).to receive(:find).with("1") { @disponibilite }
+          disponibilite = double
+          expect(Disponibilite).to receive(:find).with("1") { disponibilite }
 
-          get 'edit', id: "1"
+          expect(disponibilite).to receive(:statut) { "canceled" }
+
+          expect(controller).to receive(:date_heure_limit_answer).with(disponibilite)
+
+          get :edit, id: "1"
         end
       end
     end
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
-      disponibilite = create(:disponibilite_disponible)
-
-      get :edit, {:id => disponibilite.to_param}
+      get :edit, {id: 1}
 
       is_expected.to redirect_to(new_user_session_path)
     end
@@ -241,7 +193,6 @@ describe DisponibilitesController do
 
   describe "POST create" do
     describe "valid session" do
-
       describe "with valid params" do
         describe "with user_remplacant" do
           before(:each) do
@@ -260,13 +211,17 @@ describe DisponibilitesController do
             date_heure_fin = "2016-01-30"
             date_heure_debut = "2016-01-01"
             disponibilite_param = {date_heure_debut: "2016-01-01", date_heure_fin:"2016-01-30"}
+            demande = double("demande")
+            mailer = double
+            user_remplacant_id = double("user_remplacant_id")
+            disponibilite_id = double("disponibilite_id")
 
             expect(Disponibilite).to receive(:new).with(disponibilite_param).and_return(disponibilite)
 
             expect(disponibilite).to receive(:date_heure_fin) {date_heure_fin}
             expect(disponibilite).to receive(:date_heure_debut) {date_heure_debut}
 
-            expect(User).to receive(:find_by_next_user_remplacant_available).with(date_heure_debut, date_heure_fin) {user}
+            expect(User).to receive(:find_by_next_user_remplacant_available).with(date_heure_debut, date_heure_fin, nil) {user}
 
             expect(disponibilite).to receive(:date_time_expired=).with(DateTime.current + 3.hours)
 
@@ -278,7 +233,10 @@ describe DisponibilitesController do
 
             expect(disponibilite).to receive(:user_remplacant) {user}
 
-            mailer = double
+            expect(user).to receive(:id) {user_remplacant_id}
+            expect(disponibilite).to receive(:id) {disponibilite_id}
+
+            expect(Demande).to receive(:create!).with(user_id: user_remplacant_id, disponibilite_id: disponibilite_id, status: "waiting") {demande}
 
             expect(DisponibiliteMailer).to receive(:nouvelle_disponibilite_email).with(user, disponibilite) {mailer}
             expect(mailer).to receive(:deliver_later)
@@ -288,7 +246,6 @@ describe DisponibilitesController do
             post :create, {:disponibilite => disponibilite_param}
 
             expect(flash[:notice]).to eq "L'absence a été créée avec succès."
-
           end
 
           it "when user remplacant not founded" do
@@ -303,7 +260,7 @@ describe DisponibilitesController do
             expect(disponibilite).to receive(:date_heure_fin) {date_heure_fin}
             expect(disponibilite).to receive(:date_heure_debut) {date_heure_debut}
 
-            expect(User).to receive(:find_by_next_user_remplacant_available).with(date_heure_debut, date_heure_fin) {user}
+            expect(User).to receive(:find_by_next_user_remplacant_available).with(date_heure_debut, date_heure_fin, nil) {user}
 
             expect(disponibilite).to receive(:date_time_expired=).with(DateTime.current + 3.hours)
 
@@ -317,7 +274,6 @@ describe DisponibilitesController do
             post :create, {:disponibilite => disponibilite_param}
 
             expect(flash[:notice]).to eq "L'absence a été créée avec succès."
-
           end
 
           it "when disponibilite not saved" do
@@ -332,7 +288,7 @@ describe DisponibilitesController do
             expect(disponibilite).to receive(:date_heure_fin) {date_heure_fin}
             expect(disponibilite).to receive(:date_heure_debut) {date_heure_debut}
 
-            expect(User).to receive(:find_by_next_user_remplacant_available).with(date_heure_debut, date_heure_fin) {user}
+            expect(User).to receive(:find_by_next_user_remplacant_available).with(date_heure_debut, date_heure_fin, nil) {user}
 
             expect(disponibilite).to receive(:date_time_expired=).with(DateTime.current + 3.hours)
 
@@ -351,8 +307,6 @@ describe DisponibilitesController do
     end
 
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
-
       post :create, {:disponibilite => valid_attributes}
 
       expect(response).to redirect_to(new_user_session_path)
@@ -399,16 +353,13 @@ describe DisponibilitesController do
     end
 
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
-      @disponibilite = create(:disponibilite_disponible)
-
-      put :update, {:id => @disponibilite.to_param, :disponibilite => { "user_absent_id" => "1" }}
+      put :update, {:id => 1, :disponibilite => { "user_absent_id" => "1" }}
 
       expect(response).to redirect_to(new_user_session_path)
     end
   end
 
-  describe "DELETE destroy" do
+  describe "get cancel" do
     describe "valid session" do
       before(:each) do
         @user = FactoryGirl.create(:user_admin)
@@ -420,24 +371,42 @@ describe DisponibilitesController do
         allow(controller).to receive(:authenticate_user!)
       end
 
-      it "success" do
+      specify "success" do
         disponibilite = double
 
         expect(Disponibilite).to receive(:find).with("1") {disponibilite}
 
-        allow(disponibilite).to receive(:destroy)
+        expect(disponibilite).to receive(:statut=).with("canceled") {disponibilite}
+        expect(disponibilite).to receive(:user_remplacant=).with(nil) {disponibilite}
+        expect(disponibilite).to receive(:date_time_expired=).with(nil) {disponibilite}
+        expect(disponibilite).to receive(:save) {true}
 
-        delete :destroy, {id: 1}
+        expect(disponibilite).to receive(:id) {1}
 
-        expect(response).to redirect_to(disponibilites_url)
+        get :cancel, {id: 1}
+
+        expect(response).to redirect_to(edit_disponibilite_path)
+        expect(flash[:notice]).to eq "L'absence a été annulée avec succès."
+      end
+
+      specify "not saved successfully" do
+        disponibilite = double
+
+        expect(Disponibilite).to receive(:find).with("1") {disponibilite}
+
+        expect(disponibilite).to receive(:statut=).with("canceled") {disponibilite}
+        expect(disponibilite).to receive(:user_remplacant=).with(nil) {disponibilite}
+        expect(disponibilite).to receive(:date_time_expired=).with(nil) {disponibilite}
+        expect(disponibilite).to receive(:save) {false}
+
+        get :cancel, {id: 1}
+
+        expect(response).to render_template(:edit)
       end
     end
 
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
-      disponibilite = create(:disponibilite_disponible)
-
-      delete :destroy, {:id => disponibilite.to_param}
+      get :cancel, {id: 1}
 
       expect(response).to redirect_to(new_user_session_path)
     end
@@ -501,8 +470,6 @@ describe DisponibilitesController do
     end
 
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
-
       get :for_calendar, {start: 1417323600, end: 1420952400}, format: 'json'
 
       expect(response).to redirect_to(new_user_session_path)
@@ -583,11 +550,7 @@ describe DisponibilitesController do
       end
     end
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
-
-      disponibilite = create(:disponibilite_disponible_with_remplacant)
-
-      get :accept_availability, {:id => disponibilite}
+      get :accept_availability, {id: 1}
 
       expect(response).to redirect_to(new_user_session_path)
     end
@@ -611,6 +574,9 @@ describe DisponibilitesController do
         date_heure_debut = double
         date_heure_fin = double
         user = double
+        demande = double
+        user_remplacant_id = double("user_remplacant_id")
+        disponibilite_id = double("disponibilite_id")
 
         expect(Disponibilite).to receive(:find).with("1") { disponibilite }
 
@@ -622,11 +588,18 @@ describe DisponibilitesController do
         expect(disponibilite).to receive(:date_heure_fin) {date_heure_fin}
         expect(disponibilite).to receive(:date_heure_debut) {date_heure_debut}
 
-        expect(User).to receive(:find_by_next_user_remplacant_available).with(date_heure_debut, date_heure_fin) {user}
+        expect(disponibilite).to receive(:id) {11}
+
+        expect(User).to receive(:find_by_next_user_remplacant_available).with(date_heure_debut, date_heure_fin, 11) {user}
         expect(user).to receive(:nil?) {false}
         expect(disponibilite).to receive(:user_remplacant=) {user}
         expect(disponibilite).to receive(:date_time_expired=) {DateTime.current + 3.hours}
         expect(disponibilite).to receive(:statut=).with("waiting") {disponibilite}
+
+        expect(user).to receive(:id) {user_remplacant_id}
+        expect(disponibilite).to receive(:id) {disponibilite_id}
+
+        expect(Demande).to receive(:create!).with(user_id: user_remplacant_id, disponibilite_id: disponibilite_id, status: "waiting") {demande}
 
         expect(disponibilite).to receive(:save) { true }
 
@@ -636,7 +609,7 @@ describe DisponibilitesController do
         expect(flash[:notice]).to eq "L'absence a été refusée avec succès."
       end
 
-      it "assign refused not succed" do
+      it "assign refused success but user_remplacant not find" do
         disponibilite = double
         date_time_expired = double
         date_heure_debut = double
@@ -653,11 +626,53 @@ describe DisponibilitesController do
         expect(disponibilite).to receive(:date_heure_fin) {date_heure_fin}
         expect(disponibilite).to receive(:date_heure_debut) {date_heure_debut}
 
-        expect(User).to receive(:find_by_next_user_remplacant_available).with(date_heure_debut, date_heure_fin) {user}
+        expect(disponibilite).to receive(:id) {11}
+
+        expect(User).to receive(:find_by_next_user_remplacant_available).with(date_heure_debut, date_heure_fin, 11) {user}
+        expect(user).to receive(:nil?) {true}
+        expect(disponibilite).to receive(:user_remplacant=) {nil}
+        expect(disponibilite).to receive(:date_time_expired=) {nil}
+
+        expect(disponibilite).to receive(:save) { true }
+
+        get :deny_availability, {:id => "1"}
+
+        expect(response).to redirect_to(disponibilites_url)
+        expect(flash[:notice]).to eq "L'absence a été refusée avec succès."
+      end
+
+      it "assign refused not succed" do
+        disponibilite = double
+        date_time_expired = double
+        date_heure_debut = double
+        date_heure_fin = double
+        user = double
+        demande = double
+        user_remplacant_id = double("user_remplacant_id")
+        disponibilite_id = double("disponibilite_id")
+
+        expect(Disponibilite).to receive(:find).with("1") { disponibilite }
+
+        expect(disponibilite).to receive(:statut=).with("denied") {disponibilite}
+
+        expect(disponibilite).to receive(:date_time_expired) {date_time_expired}
+        expect(controller).to receive(:is_time_expired?).with(date_time_expired) {false}
+
+        expect(disponibilite).to receive(:date_heure_fin) {date_heure_fin}
+        expect(disponibilite).to receive(:date_heure_debut) {date_heure_debut}
+
+        expect(disponibilite).to receive(:id) {11}
+
+        expect(User).to receive(:find_by_next_user_remplacant_available).with(date_heure_debut, date_heure_fin, 11) {user}
         expect(user).to receive(:nil?) {false}
         expect(disponibilite).to receive(:user_remplacant=) {user}
         expect(disponibilite).to receive(:date_time_expired=) {DateTime.current + 3.hours}
         expect(disponibilite).to receive(:statut=).with("waiting") {disponibilite}
+
+        expect(user).to receive(:id) {user_remplacant_id}
+        expect(disponibilite).to receive(:id) {disponibilite_id}
+
+        expect(Demande).to receive(:create!).with(user_id: user_remplacant_id, disponibilite_id: disponibilite_id, status: "waiting") {demande}
 
         expect(disponibilite).to receive(:save) { false }
 
@@ -689,11 +704,7 @@ describe DisponibilitesController do
       end
     end
     it "invalid session" do
-      allow(request.env['warden']).to receive(:authenticate!).and_throw(:warden, {:scope => :user})
-
-      disponibilite = create(:disponibilite_disponible_with_remplacant)
-
-      get :deny_availability, {:id => disponibilite}
+      get :deny_availability, {id: 1}
 
       expect(response).to redirect_to(new_user_session_path)
     end

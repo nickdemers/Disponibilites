@@ -18,6 +18,7 @@ Disponibilites::Application.routes.draw do
       get "accept_availability/:id" => 'disponibilites#accept_availability', :as => :accept
       get "deny_availability/:id" => 'disponibilites#deny_availability', :as => :deny
     end
+    get "cancel", on: :member
   end
 
   resources :users

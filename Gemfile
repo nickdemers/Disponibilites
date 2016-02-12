@@ -1,22 +1,18 @@
 source 'https://rubygems.org'
 
-gem 'rails', '4.2.0'#'4.0.3'
+gem 'rails', '4.2.0'
 gem 'rack'
-
 gem 'mysql2'
-
-gem 'sass-rails'#, '5.0.1'#'~> 4.0.0'
+gem 'sass-rails'
 
 # Gems used only for assets and not required
 # in production environments by default.
-gem 'coffee-rails'#, '4.1.0'#'~> 4.0.0'
+gem 'coffee-rails'
 gem 'therubyracer'
 gem 'less-rails' #Sprockets (what Rails 3.1 uses for its asset pipeline) supports LESS
-gem 'uglifier' #, '>= 1.0.3'
-
+gem 'uglifier'
 gem 'twitter-bootstrap-rails', :git => 'git://github.com/seyhunak/twitter-bootstrap-rails.git'
 gem "compass-rails", "~> 2.0.alpha.0"
-
 gem 'jquery-rails'
 
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
@@ -34,7 +30,6 @@ gem 'cancancan', '~> 1.10'
 # Encryption du mot de passe
 gem 'bcrypt-ruby'
 gem 'bcrypt', '~> 3.1.7'
-
 gem 'rails_admin', git: 'git@github.com:sferik/rails_admin.git'
 gem 'rails_admin-i18n'
 
@@ -48,12 +43,12 @@ group :doc do
   gem 'sdoc', require: false
 end
 
-group :development, :test do
-  gem 'cucumber-rails', :require => false, group: [:test]
-  gem 'database_cleaner', group: [:test]
-  gem 'factory_girl_rails', group: [:test]
-  gem 'capybara', group: [:test]
-  gem 'rspec', group: [:test]
-  gem 'rspec-rails', group: [:test]
-  gem 'simplecov', :require => false, :group => :test
+group :test do
+  gem 'cucumber-rails', :require => false
+  gem 'database_cleaner'
+  gem 'factory_girl_rails'
+  gem 'capybara'
+  gem 'rspec'
+  gem 'rspec-rails'
+  gem 'simplecov', :require => false
 end
